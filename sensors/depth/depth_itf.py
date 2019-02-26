@@ -5,7 +5,7 @@ import abc
 from sensors.base_sensor_itf import IBaseSensor
 
 
-class IDepthSensor(metaclass=abc.ABCMeta):
+class IDepthSensor(IBaseSensor):
     """
     Class for getting data from depth sensor by use of virtual file
     """
