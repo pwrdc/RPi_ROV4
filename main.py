@@ -21,7 +21,7 @@ class Main():
     '''
     def __init__(self):
         '''
-        Creates and toring references of all slave objects.
+        Creates and stores references of all slave objects.
         '''
         self.sensors_refs = {
             'DepthSensor': #Depth sensor class init here
@@ -29,8 +29,11 @@ class Main():
         #Here you can add more feature classes
         #Remeber then to provide proper Communication class methods
 
-        self.comm = Communication(self.sensors_refs)
-
+        self.comm = Communication(self.sensors_refs,'RPI_IP_ADDRESS_HERE')
+        '''
+        Communication class parameters are: sensors_refs, rpi_address,
+        main_logger, local_logger, log_directory (last three are optional)
+        '''
 
 
 
