@@ -1,8 +1,10 @@
 from sensors.depth.depth_itf import IDepthSensor
 
+
 class DepthSensor(IDepthSensor):
     '''
     '''
+    @IDepthSensor.multithread_method
     def get_depth(self):
         '''
         Get current depth
