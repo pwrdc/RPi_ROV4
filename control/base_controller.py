@@ -1,8 +1,7 @@
 """
 Module includes BaseSensor class
 """
-from threading import Thread
-from LogPy.LogPy import Logger
+from logpy import Logger
 
 
 class BaseController():
@@ -19,11 +18,8 @@ class BaseController():
         self.local_logger = None
         if local_log:
             self.local_logger = Logger(filename=self.__class__.__name__.lower(),
-                                       log_directory=log_directory,
+                                       directory=log_directory,
                                        title=self.__class__.__name__)
-            self.local_logger_thread = Thread(target=self.local_logger,
-                                              name='My Logger')
-            self.local_logger_thread.start()
 
     def run(self):
         """
@@ -33,8 +29,10 @@ class BaseController():
         implement this method with pass
 
         In case of sensor logging - place for start logging thread
+        !! call parent's run method in case of override !!
         """
-        pass
+        if self.local_logger:
+            self.local_logger.start()
 
     def close(self):
         """
@@ -44,12 +42,13 @@ class BaseController():
         If class does not need to close separate thread,
         implement this method with pass
         """
-        pass
+        if self.local_logger:
+            self.local_logger.exit()
 
     def log(self, msg, logtype=''):
         """
         Send log to main and local logger
-        
+
         :param msg: string which contain message for log
         :param logtype: message logtype, log type; available:
             'info', 'warning', 'error', 'fatal'
