@@ -35,3 +35,14 @@ class BaseSensor(BaseController, metaclass=abc.ABCMeta):
         :return: string containing single log message
         """
         pass
+
+    @staticmethod
+    def multithread_method(function):
+        """
+        Wraper for use with multiple threads accessing them
+        All method called by getter2msg should have this decorator
+        """
+        def wrapper(self, *args):
+            with self.local_logger_lock:
+                function(self, args)
+            return wrapper
