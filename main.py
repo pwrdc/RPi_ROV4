@@ -4,6 +4,7 @@ from sensors.distance.distance import DistanceSensor
 from sensors.depth.depth import DepthSensor
 from sensors.hydrophone.hydrophones import HydrophonesPair
 from sensors.ahrs.ahrs import AHRS
+from control.movements.movements import Movements
 
 '''
 Main object (thread) provides all sensors objects
@@ -27,10 +28,7 @@ class Main():
         Creates and stores references of all slave objects.
         '''
         self.sensors_refs = {
-            'DepthSensor': DepthSensor(),
-            'Hydrophones': HydrophonesPair(),
-            'DistanceSensor': DistanceSensor(),
-            'AHRS': AHRS()
+            'Movements':Movements()
         }
         #Here you can add more feature classes
         #Remeber then to provide proper Communication class methods

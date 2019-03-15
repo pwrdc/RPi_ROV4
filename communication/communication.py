@@ -40,7 +40,7 @@ class Communication(threading.Thread):
         main_logger.log('Communication server set correctly')
         daemon.requestLoop()
         #Starting Pyro4 server loop
-
+    
     def take_depth(self):
         '''
         Method provides DepthSensor class get_depth() method to Pyro server
@@ -98,6 +98,13 @@ class Communication(threading.Thread):
             main_logger.log(name + str(msg))
         if local_logger != False:
             local_logger.log(name + str(msg))
+    
+    def movements(self,front,right,up,yaw,roll=0,pitch=0):
+		'''
+		Method for pad steering for tests.
+		'''
+		self.refs['Movements'].set_lin_velocity(front,right,up)
+		self.refs['Movements'].set_ang_velocity(roll,pitch,yaw)
 '''
 TO DO:
 Change refs[] values to dictionary keys in Communication class methods
