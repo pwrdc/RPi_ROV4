@@ -3,7 +3,7 @@
 Module includes Movemnets clas
 """
 
-from movements_itf import IMovements
+from control.movements.movements_itf import IMovements
 
 
 
@@ -33,7 +33,7 @@ class Movements(IMovements):
 
         """
 
-        pass
+        print("Linear velocity:",front,right,up)
 
 
 
@@ -51,7 +51,7 @@ class Movements(IMovements):
 
         """
 
-        pass
+        print("Angular velocity:",roll,pitch,yaw)
 
 
 

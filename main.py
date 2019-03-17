@@ -1,9 +1,11 @@
 import threading
-import communication.communication
+from communication.communication import Communication
+"""
 from sensors.distance.distance import DistanceSensor
 from sensors.depth.depth import DepthSensor
 from sensors.hydrophone.hydrophones import HydrophonesPair
 from sensors.ahrs.ahrs import AHRS
+"""
 from control.movements.movements import Movements
 
 '''
@@ -33,7 +35,7 @@ class Main():
         #Here you can add more feature classes
         #Remeber then to provide proper Communication class methods
 
-        self.comm = Communication(self.sensors_refs,'RPI_IP_ADDRESS_HERE')
+        self.comm = Communication(self.sensors_refs,'192.168.0.190')
         '''
         Communication class parameters are: sensors_refs, rpi_address,
         main_logger, local_logger, log_directory (last three are optional)
