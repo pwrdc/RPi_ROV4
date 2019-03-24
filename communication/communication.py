@@ -37,7 +37,7 @@ class Communication(threading.Thread):
         except Exception as err:
             main_logger.log('Problem with communication '+err)
 
-        #main_logger.log('Communication server set correctly')
+        main_logger.log('Communication server set correctly')
         daemon.requestLoop()
         #Starting Pyro4 server loop
     """
@@ -90,19 +90,24 @@ class Communication(threading.Thread):
         '''
         logging(set_velocity.__name__,' '+str(velocity))    #velocity is set_velocity future parameter
         self.refs[].set_velocity()
+    """
     def logging(self,name,msg = ''):
         '''
         Method is used for logging class Communication methods calls
         '''
-        if main_logger != None:
-            main_logger.log(name + str(msg))
-        if local_logger != False:
-            local_logger.log(name + str(msg))
-    """
+        if self.main_logger != None:
+            self.main_logger.log(name + str(msg))
+        if self.local_logger != False:
+            self.local_logger.log(name + str(msg))
+
     def movements(self,front,right,up,yaw,roll=0,pitch=0):
         '''
 		Method for pad steering for tests.
 		'''
+        #self.logging('Front ',front)
+        #self.logging('Right ',right)
+        #self.logging('Up ',up)
+        #self.logging('Yaw ',yaw)
         self.refs['Movements'].set_lin_velocity(front,right,up)
         self.refs['Movements'].set_ang_velocity(roll,pitch,yaw)
 '''

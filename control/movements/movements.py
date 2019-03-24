@@ -33,7 +33,7 @@ class Movements(IMovements):
 
         """
 
-        print("Linear velocity:",front,right,up)
+        #print("Linear velocity:",front,right,up)
 
 
 
@@ -51,7 +51,7 @@ class Movements(IMovements):
 
         """
 
-        print("Angular velocity:",roll,pitch,yaw)
+        #print("Angular velocity:",roll,pitch,yaw)
 
 
 
