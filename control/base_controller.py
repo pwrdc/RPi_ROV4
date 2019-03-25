@@ -1,7 +1,7 @@
 """
 Module includes BaseSensor class
 """
-#from logpy import Logger
+from logpy import Logger
 
 
 class BaseController():
@@ -17,10 +17,9 @@ class BaseController():
         self.main_logger = main_logger
         self.local_logger = None
         if local_log:
-            pass
-            #self.local_logger = Logger(filename=self.__class__.__name__.lower(),
-            #                           directory=log_directory,
-            #                           title=self.__class__.__name__)
+            self.local_logger = Logger(filename=self.__class__.__name__.lower(),
+                                       directory=log_directory,
+                                       title=self.__class__.__name__)
 
     def run(self):
         """

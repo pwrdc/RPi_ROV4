@@ -107,7 +107,7 @@ class Communication(threading.Thread):
         #self.logging('Front ',front)
         #self.logging('Right ',right)
         #self.logging('Up ',up)
-        #self.logging('Yaw ',yaw)
+        #self.logging('Movements method ','called')
         self.refs['Movements'].set_lin_velocity(front,right,up)
         self.refs['Movements'].set_ang_velocity(roll,pitch,yaw)
 '''

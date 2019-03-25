@@ -11,3 +11,6 @@ class DepthSensor(IDepthSensor):
         :return: depth as single integer
         '''
         pass
+
+    def getter2msg():
+        return str(get_depth())
