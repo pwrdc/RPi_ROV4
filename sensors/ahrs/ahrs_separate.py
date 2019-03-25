@@ -3,8 +3,9 @@ import threading
 import time
 
 import serial
+import os
 
-
+IMU_PORT = '/dev/ttyUSB0'
 
 class BytesQueue:
     def __init__(self, buffer: bytes):
@@ -31,8 +32,8 @@ class AHRS_Separate():
     free_acc = [0, 0, 0]
     rate_of_turn = [0, 0, 0]
 
-    def __init__(self, source: serial.Serial):
-        self.serial = source
+    def __init__(self):
+        self.serial = serial_port = serial.Serial(IMU_PORT, 115200, stopbits=2, parity=serial.PARITY_NONE)
         self.lock_rate_of_turn = threading.Lock()
         self.lock_free_acc = threading.Lock()
         self.lock_angular_pos = threading.Lock()
@@ -167,10 +168,16 @@ class AHRS_Separate():
     def close(self):
         self.close_order = True
 
+    @staticmethod
+    def isAHRSconected():
+        '''
+        :return: True if you can use AHRS or False if you can't
+        '''
+        return os.path.exists(IMU_PORT)
 
 if __name__ == "__main__":
-    with serial.Serial('/dev/ttyUSB0', 115200, stopbits=2, parity=serial.PARITY_NONE) as serial_port:
-        imu = AHRS_Separate(serial_port)
+    with serial.Serial(IMU_PORT, 115200, stopbits=2, parity=serial.PARITY_NONE) as serial_port:
+        imu = AHRS_Separate()
 
         while True:
             imu.get_message()
