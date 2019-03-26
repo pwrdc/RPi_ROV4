@@ -1,12 +1,14 @@
 import threading
 from communication.communication import Communication
+from control.movements import settings
+from control.movements.rov_comm import Client
 """
 from sensors.distance.distance import DistanceSensor
 
 from sensors.hydrophone.hydrophones import HydrophonesPair
 
 """
-#from sensors.ahrs.ahrs import AHRS
+from sensors.ahrs.ahrs import AHRS
 from control.movements.movements import Movements
 from logpy.LogPy import Logger
 from sensors.depth.depth import DepthSensor
@@ -32,19 +34,24 @@ class Main():
         Creates and stores references of all slave objects.
         '''
         self.logger = Logger(filename='main',directory='',logtype='info',timestamp='%Y-%m-%d | %H:%M:%S.%f',logformat='[{timestamp}] {logtype}:    {message}',prefix='',postfix='',title='Main Logger',logexists='append',console=False)
-        #self.ahrs = AHRS(main_logger = self.logger, local_log = True)
-        #self.depth = DepthSensor(main_logger = self.logger, local_log = True)
-        #self.depth.run()
+        self.ahrs = AHRS(main_logger = self.logger, local_log = True)
+        self.depth = DepthSensor(main_logger = self.logger, local_log = False)
+        self.depth.run()
+        self.comm_logger = Logger(filename='communication',directory='',logtype='info',timestamp='%Y-%m-%d | %H:%M:%S.%f',logformat='[{timestamp}] {logtype}:    {message}',prefix='',postfix='',title='Communication Logger',logexists='append',console=False)
         self.logger.start()
-        #self.ahrs.run()
+        self.comm_logger.start()
+        self.ahrs.run()
+        
         self.sensors_refs = {
-            'Movements':Movements()
+            'Engines':Client(settings.engine_master_port),
+            'AHRS':self.ahrs,
+            #'DepthSensor':self.depth
         }
         #Here you can add more feature classes
         #Remeber then to provide proper Communication class methods
 
-        self.comm = Communication(self.sensors_refs,'192.168.0.190',
-        main_logger = self.logger)
+        self.comm = Communication(self.sensors_refs,'192.168.43.15',
+        main_logger = self.logger, local_logger = self.comm_logger)
         '''
         Communication class parameters are: sensors_refs, rpi_address,
         main_logger, local_logger, log_directory (last three are optional)

@@ -107,9 +107,69 @@ class Communication(threading.Thread):
         #self.logging('Front ',front)
         #self.logging('Right ',right)
         #self.logging('Up ',up)
-        #self.logging('Movements method ','called')
-        self.refs['Movements'].set_lin_velocity(front,right,up)
-        self.refs['Movements'].set_ang_velocity(roll,pitch,yaw)
+        powers = self.calc_eng_pwr(front,right,up,yaw)
+        log = 'Front '+str(front)+' Right: '+str(right)+' Up '+str(up)+' Yaw '+str(yaw)
+        self.local_logger.log(log)
+        #print('Powers called',powers)
+        self.refs['Engines'].send_data(powers)
+
+    def calc_eng_pwr(self,front,right,up,yaw):
+        vlvr_to_vb = 0.5
+        # stosunek mocy silników pionowych przednich do tylnego
+
+        # do konfiguracji
+
+        # zakres (0,1)
+
+
+
+        fl = 1
+
+        fr = fl - right - yaw
+
+        bl = fl - front - yaw
+
+        br = fl - right - front
+
+        vb = up
+
+        vl = up * vlvr_to_vb
+
+
+
+        correction = -0.5 * (min(fl, fr, bl, br) + max(fl, fr, bl, br))
+
+
+
+        fl += correction
+
+        fr += correction
+
+        bl += correction
+
+        br += correction
+
+
+
+        motor_powers = {
+
+            "fl": fl,
+
+            "fr": fr,
+
+            "bl": bl,
+
+            "br": br,
+
+            "vl": vl,
+
+            "vr": vl,
+
+            "vb": vb
+
+        }
+
+        return motor_powers
 '''
 TO DO:
 Change refs[] values to dictionary keys in Communication class methods
