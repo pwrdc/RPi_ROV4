@@ -90,7 +90,7 @@ class Client():
         self.port = port
         self.timeout = timeout
         self.context = zmq.Context()
-        print("Connecting to server…")
+        print("Connecting to server… rov_comm.py.Client")
         self.socket = self.context.socket(zmq.REQ)
         self.socket.setsockopt(zmq.RCVTIMEO, timeout)
         self.socket.connect("tcp://localhost:" + str(self.port))

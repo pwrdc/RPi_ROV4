@@ -35,7 +35,7 @@ class Main():
         '''
         self.logger = Logger(filename='main',directory='',logtype='info',timestamp='%Y-%m-%d | %H:%M:%S.%f',logformat='[{timestamp}] {logtype}:    {message}',prefix='',postfix='',title='Main Logger',logexists='append',console=False)
         self.ahrs = AHRS(main_logger = self.logger, local_log = True)
-        self.depth = DepthSensor(main_logger = self.logger, local_log = False)
+        self.depth = DepthSensor(main_logger = self.logger, local_log = True)
         self.depth.run()
         self.comm_logger = Logger(filename='communication',directory='',logtype='info',timestamp='%Y-%m-%d | %H:%M:%S.%f',logformat='[{timestamp}] {logtype}:    {message}',prefix='',postfix='',title='Communication Logger',logexists='append',console=False)
         self.logger.start()
@@ -44,13 +44,13 @@ class Main():
         
         self.sensors_refs = {
             'Engines':Client(settings.engine_master_port),
-            'AHRS':self.ahrs,
+            #'AHRS':self.ahrs,
             #'DepthSensor':self.depth
         }
         #Here you can add more feature classes
         #Remeber then to provide proper Communication class methods
 
-        self.comm = Communication(self.sensors_refs,'192.168.43.15',
+        self.comm = Communication(self.sensors_refs,'192.168.0.190',
         main_logger = self.logger, local_logger = self.comm_logger)
         '''
         Communication class parameters are: sensors_refs, rpi_address,

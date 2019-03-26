@@ -104,13 +104,9 @@ class Communication(threading.Thread):
         '''
 		Method for pad steering for tests.
 		'''
-        #self.logging('Front ',front)
-        #self.logging('Right ',right)
-        #self.logging('Up ',up)
         powers = self.calc_eng_pwr(front,right,up,yaw)
-        log = 'Front '+str(front)+' Right: '+str(right)+' Up '+str(up)+' Yaw '+str(yaw)
-        self.local_logger.log(log)
-        #print('Powers called',powers)
+        #log = 'Front '+str(front)+' Right: '+str(right)+' Up '+str(up)+' Yaw '+str(yaw)
+        #self.local_logger.log(log)
         self.refs['Engines'].send_data(powers)
 
     def calc_eng_pwr(self,front,right,up,yaw):
