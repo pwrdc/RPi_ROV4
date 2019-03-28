@@ -24,6 +24,9 @@ It is backed by easier use of Communication class from Xavier level.
 
 '''
 
+#definitions
+RPI_ADDRESS = '192.168.0.100'
+
 class Main():
     '''
     Creates object of all sensor types, packs their references into
@@ -35,8 +38,8 @@ class Main():
         '''
         self.logger = Logger(filename='main',directory='',logtype='info',timestamp='%Y-%m-%d | %H:%M:%S.%f',logformat='[{timestamp}] {logtype}:    {message}',prefix='',postfix='',title='Main Logger',logexists='append',console=False)
         self.ahrs = AHRS(main_logger = self.logger, local_log = True)
-        self.depth = DepthSensor(main_logger = self.logger, local_log = True)
-        self.depth.run()
+        #self.depth = DepthSensor(main_logger = self.logger, local_log = True)
+        #self.depth.run()
         self.comm_logger = Logger(filename='communication',directory='',logtype='info',timestamp='%Y-%m-%d | %H:%M:%S.%f',logformat='[{timestamp}] {logtype}:    {message}',prefix='',postfix='',title='Communication Logger',logexists='append',console=False)
         self.logger.start()
         self.comm_logger.start()
@@ -50,7 +53,7 @@ class Main():
         #Here you can add more feature classes
         #Remeber then to provide proper Communication class methods
 
-        self.comm = Communication(self.sensors_refs,'192.168.0.190',
+        self.comm = Communication(self.sensors_refs, RPI_ADDRESS,
         main_logger = self.logger, local_logger = self.comm_logger)
         '''
         Communication class parameters are: sensors_refs, rpi_address,

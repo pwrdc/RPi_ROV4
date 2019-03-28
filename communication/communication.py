@@ -8,7 +8,7 @@ class Communication(threading.Thread):
     registering itself in there and providing all methods
     what classes passed from main thread offer.
     '''
-    def __init__(self,sensors_refs,rpi_address, main_logger=None, local_logger=False, log_directory=''):
+    def __init__(self,sensors_refs, rpi_address, main_logger=None, local_logger=False, log_directory=''):
         '''
         Starting new thread, starting Pyro4 server,
         finding Pyro4 nameserver, registering 'self' in the nameserver,
@@ -28,14 +28,14 @@ class Communication(threading.Thread):
             #Tries to find Pyro nameserver
 
         except Exception as err:
-            main_logger.log("Most probably couldn't find name server "+err)
+            main_logger.log("Most probably couldn't find name server "+str(err))
 
         try:
             name_server.register('RPI_communication',daemon.register(self))
             #Tries to register self object in Pyro4 nameserver as 'RPI_communication'
 
         except Exception as err:
-            main_logger.log('Problem with communication '+err)
+            main_logger.log('Problem with communication '+str(err))
 
         main_logger.log('Communication server set correctly')
         daemon.requestLoop()
