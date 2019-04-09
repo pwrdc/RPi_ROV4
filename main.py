@@ -1,17 +1,15 @@
 import threading
 from communication.communication import Communication
-from control.movements import settings
 from control.movements.rov_comm import Client
 """
 from sensors.distance.distance import DistanceSensor
-
 from sensors.hydrophone.hydrophones import HydrophonesPair
 
 """
 from sensors.ahrs.ahrs import AHRS
 from control.movements.movements import Movements
-from logpy.LogPy import Logger
 from sensors.depth.depth import DepthSensor
+from logpy.LogPy import Logger
 '''
 Main object (thread) provides all sensors objects
 and passes them to new thread Communication.
@@ -40,13 +38,11 @@ class Main():
         self.ahrs = AHRS(main_logger = self.logger, local_log = True)
         #self.depth = DepthSensor(main_logger = self.logger, local_log = True)
         #self.depth.run()
-        self.comm_logger = Logger(filename='communication',directory='',logtype='info',timestamp='%Y-%m-%d | %H:%M:%S.%f',logformat='[{timestamp}] {logtype}:    {message}',prefix='',postfix='',title='Communication Logger',logexists='append',console=False)
         self.logger.start()
-        self.comm_logger.start()
         self.ahrs.run()
         
         self.sensors_refs = {
-            'Engines':Client(settings.engine_master_port),
+            'Movements':''),
             #'AHRS':self.ahrs,
             #'DepthSensor':self.depth
         }
@@ -54,7 +50,7 @@ class Main():
         #Remeber then to provide proper Communication class methods
 
         self.comm = Communication(self.sensors_refs, RPI_ADDRESS,
-        main_logger = self.logger, local_logger = self.comm_logger)
+        main_logger = self.logger)
         '''
         Communication class parameters are: sensors_refs, rpi_address,
         main_logger, local_logger, log_directory (last three are optional)
