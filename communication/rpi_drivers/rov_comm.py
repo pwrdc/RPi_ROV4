@@ -9,9 +9,6 @@ class ZMQ_Server():
     driver_up (Bool) - czy sterownik jest podłączony
     client_up (Bool) - czy klient jest podłączony
     """
-    data = "received no data from driver"
-    driver_up = False
-    client_up = False
 
     def __init__(self, driver_port, client_port, sleep_time=0.1, timeout=100):
         """
@@ -22,7 +19,16 @@ class ZMQ_Server():
         :param timeout: -> czas oczekiwania na otrzymanie lub odebranie wiadomości [ms]
 
         """
-
+        self.data = {
+            'front':0,
+            'right':0,
+            'up':0,
+            'roll':0,
+            'pitch':0,
+            'yaw':0
+        }
+        self.driver_up = False
+        self.client_up = False
         self.sleep_time = sleep_time
 
         self.driver_context = zmq.Context()
@@ -40,6 +46,7 @@ class ZMQ_Server():
         self.driver_socket.bind(self.driver_adress)
         self.client_socket.bind(self.client_adress)
 
+
         print("Server active...")
 
     def run(self):
@@ -52,6 +59,7 @@ class ZMQ_Server():
         while True:
             time.sleep(self.sleep_time)
             try:
+                #TODO: change implementation to receive dictionary 
                 self.data = self.driver_socket.recv()  # zmq.NOBLOCK)
                 #print("Driver connected...")
                 self.driver_socket.send(b"thanks")  # ,zmq.NOBLOCK)
