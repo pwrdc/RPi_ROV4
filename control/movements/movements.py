@@ -2,7 +2,8 @@
 
 Module includes Movemnets clas
 """
-
+from communication.rpi_drivers.rov_comm import Client
+import communication.rpi_drivers.settings
 from control.movements.movements_itf import IMovements
 
 
@@ -18,7 +19,9 @@ class Movements(IMovements):
     Interfce for algorithm for accesing rpi Movement Class
 
     """
-
+    def __init__(self):
+        super.__init__
+        self.client = Client(movement_client_port)
     def set_lin_velocity(self, front, right, up):
 
         """
@@ -32,8 +35,9 @@ class Movements(IMovements):
         @param: up int in range [-100,100], case negative value move down
 
         """
-
-        #print("Linear velocity:",front,right,up)
+        self.client.send_data(to_dict(front=front,
+        right=right,up=up))
+        
 
 
 
@@ -50,6 +54,8 @@ class Movements(IMovements):
         @param: yaw int in range [-100,100], case negative - reverse direction
 
         """
+        self.client.send_data(to_dict(roll=roll,
+        pitch=pitch,yaw=yaw))
 
         #print("Angular velocity:",roll,pitch,yaw)
 
@@ -91,3 +97,13 @@ class Movements(IMovements):
 
         pass
 
+    def to_dict(self, front=None,right=None,up=None,roll=None
+    ,pitch=None,yaw=None):
+    '''
+    Converting data to dictionary
+    '''
+        dic = locals()
+        for i in dic:
+            if i == None:
+                del i
+        return dic
