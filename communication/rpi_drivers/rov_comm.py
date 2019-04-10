@@ -1,5 +1,6 @@
 import zmq
 import time
+import ast
 
 
 class ZMQ_Server():
@@ -59,8 +60,15 @@ class ZMQ_Server():
         while True:
             time.sleep(self.sleep_time)
             try:
-                #TODO: change implementation to receive dictionary 
                 self.data = self.driver_socket.recv()  # zmq.NOBLOCK)
+                try:
+                    self.data = self.data.decode("utf-8")
+                    self.data = ast.literal_eval(self.data)
+                except Exception as e:
+                    print('Probably wrong data type, exception:',e)
+                
+                #print(self.data)
+
                 #print("Driver connected...")
                 self.driver_socket.send(b"thanks")  # ,zmq.NOBLOCK)
                 self.driver_up = True

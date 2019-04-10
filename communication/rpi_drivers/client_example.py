@@ -1,6 +1,7 @@
 import rov_comm
 import datetime
 import settings
+import ast
 
 driver = rov_comm.Client(settings.imu_driver_port)
 client = rov_comm.Client(settings.imu_client_port)
@@ -9,9 +10,11 @@ if not (driver.connection_on is True and client.connection_on is True):
     print("server down")
 else:
     while True:
-        driver.send_data(datetime.datetime.now().time())
+        driver.send_data({'A':1,'B':2})
         data = client.get_data()
-        print(data)
+        data = data.decode("utf-8")
+        data = ast.literal_eval(data)
+        #print(type(data))
 
 print("Goodbye")
 
