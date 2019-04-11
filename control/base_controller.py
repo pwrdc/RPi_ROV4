@@ -2,24 +2,44 @@
 Module includes BaseSensor class
 """
 from logpy import Logger
-
+import zmq
+import ast
 
 class BaseController():
     """
-    All controllers in sensors directory shoud inherit from this class
+    All controllers in sensors directory should inherit from this class
     """
-    def __init__(self, main_logger=None, local_log=False, log_directory=""):
+    def __init__(self,port,timeout, main_logger=None, local_log=False, log_directory=""):
         """
+        :param port: port for zmq client server communication
+        :param timeout: recommended 2 times bigger than server timeout
         :param main_logger: reference to external logger
         :param local_log: create local file with logs
         :param log_directory: directory for file with local logs
         """
+        self.server_up = False
+        self.connection_on = False
+        self.port = port
+        self.timeout =timeout
+        self.context = zmq.Context()
         self.main_logger = main_logger
         self.local_logger = None
         if local_log:
             self.local_logger = Logger(filename=self.__class__.__name__.lower(),
                                        directory=log_directory,
                                        title=self.__class__.__name__)
+        self.socket = self.context.socket(zmq.REQ)
+        self.socket.setsockopt(zmq.RCVTIMEO, self.timeout)
+        self.socket.connect("tcp://localhost:" + str(self.port))
+        self.connection_on = True
+    
+    def reboot(self):
+        print("rebooting")
+        self.context = zmq.Context()
+        print("Trying to reconnect…")
+        self.socket = self.context.socket(zmq.REQ)
+        self.socket.setsockopt(zmq.RCVTIMEO, self.timeout)
+        self.socket.connect("tcp://localhost:" + str(self.port))
 
     def run(self):
         """

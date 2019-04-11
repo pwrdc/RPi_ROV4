@@ -11,9 +11,10 @@ class IDistanceSensor(BaseSensor, metaclass=abc.ABCMeta):
     """
     @abc.abstractmethod
     def get_front_distance(self):
-        """
+        '''
         Get distance from obsicle in front of ROV
 
         :return: single integer which represent distnace of obstacle in cm
-        """
+        '''
         pass
+

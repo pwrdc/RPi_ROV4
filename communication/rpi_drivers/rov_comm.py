@@ -11,7 +11,7 @@ class ZMQ_Server():
     client_up (Bool) - czy klient jest podłączony
     """
 
-    def __init__(self, driver_port, client_port, sleep_time=0.1, timeout=100):
+    def __init__(self,data_template, driver_port, client_port, sleep_time=0.1, timeout=100):
         """
         Metoda inicjalizująca serwer dla dwóch portów na localhost
         :param driver_port: -> port sterownika
@@ -20,14 +20,7 @@ class ZMQ_Server():
         :param timeout: -> czas oczekiwania na otrzymanie lub odebranie wiadomości [ms]
 
         """
-        self.data = {
-            'front':0,
-            'right':0,
-            'up':0,
-            'roll':0,
-            'pitch':0,
-            'yaw':0
-        }
+        self.data = data_template
         self.driver_up = False
         self.client_up = False
         self.sleep_time = sleep_time
@@ -79,7 +72,8 @@ class ZMQ_Server():
             try:
                 message = self.client_socket.recv()  # zmq.NOBLOCK)
                 #print("Client connected...")
-                self.client_socket.send(bytes(str(self.data), 'utf-8'))  # ,zmq.NOBLOCK)
+                #self.client_socket.send(bytes(str(self.data), 'utf-8'))  # ,zmq.NOBLOCK)
+                self.client_socket.send(bytes(str(self.data), 'utf-8'))
                 self.client_up = True
             except zmq.error.Again:
                 self.client_up = False
@@ -125,6 +119,8 @@ class Client():
             self.socket.send(b"give")
             #print("Sending request...")
             message = self.socket.recv()
+            message = data.decode("utf-8")
+            message = ast.literal_eval(data)
             #print("Received reply:", message)
             self.server_up = True
             return message
