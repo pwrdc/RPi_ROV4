@@ -18,7 +18,7 @@ class Base():
         """
         self.main_logger = main_logger
         self.local_logger = None
-        self.getter2msg = None
+        #self.getter2msg = None
         if local_log:
             self.local_logger = Logger(filename=self.__class__.__name__.lower(),
                                    directory=log_directory,

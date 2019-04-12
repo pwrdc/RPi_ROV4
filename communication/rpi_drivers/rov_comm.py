@@ -119,7 +119,7 @@ class Client():
             self.socket.send(b"give")
             #print("Sending request...")
             message = self.socket.recv()
-            message = data.decode("utf-8")
+            message = message.decode("utf-8")
             message = ast.literal_eval(data)
             #print("Received reply:", message)
             self.server_up = True
