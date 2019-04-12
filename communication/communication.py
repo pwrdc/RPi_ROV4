@@ -39,10 +39,4 @@ class Communication(threading.Thread):
         main_logger.log('Communication server set correctly')
         daemon.requestLoop()
         #Starting Pyro4 server loop
-    
-    
-'''
-TO DO:
-Change refs[] values to dictionary keys in Communication class methods
-(Like in the take_depth() method)
-'''
+
