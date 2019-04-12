@@ -51,3 +51,13 @@ class IMovements(BaseController, metaclass=abc.ABCMeta):
         """
         pass
 
+    @abc.abstractmethod
+    def _set_engine_driver_values(self, front, right, up, roll, pitch, yaw):
+        """
+        Set angular velocity as 100% of engines power
+        :param roll: float in range [-1, 1], case negative - reverse direction
+        :param pitch: float in range [-1, 1], case negative - reverse direction
+        :param yaw: float in range [-1,1], case negative - reverse direction
+        """
+        pass
+
