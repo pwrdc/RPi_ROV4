@@ -1,7 +1,9 @@
 import rov_comm
 import datetime
-import settings
 
-server = rov_comm.ZMQ_Server(settings.imu_driver_port, settings.imu_client_port)
+CLIENT_PORT = 1234
+DRIVER_PORT = 1235
+
+server = rov_comm.ZMQ_Server(data_template=0, client_port=CLIENT_PORT, driver_port=DRIVER_PORT)
 
 server.run()

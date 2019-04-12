@@ -3,7 +3,7 @@
 Module includes Movemnets clas
 """
 from communication.rpi_drivers.rov_comm import Client
-from communication.rpi_drivers.settings import movement_client_port
+from communication.rpi_drivers.ports import ENGINE_MASTER_PORT
 from control.movements.movements_itf import IMovements
 from control.pid.pid import PID
 
@@ -17,7 +17,7 @@ class Movements(IMovements):
     """
     def __init__(self, depth_sensor_ref, ahrs_ref):
         super().__init__()
-        self.client = Client(movement_client_port)
+        self.client = Client(ENGINE_MASTER_PORT)
         self.pid = PID(self._set_engine_driver_values, depth_sensor_ref.get_depth, ahrs_ref, LOOP_DELAY)
 
     def set_lin_velocity(self, front, right, up):

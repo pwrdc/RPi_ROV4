@@ -1,15 +1,16 @@
-import threading
-from communication.communication import Communication
-from control.movements.rov_comm import Client
-"""
-from sensors.distance.distance import DistanceSensor
-from sensors.hydrophone.hydrophones import HydrophonesPair
-
-"""
-from sensors.ahrs.ahrs import AHRS
-from control.movements.movements import Movements
-from sensors.depth.depth import DepthSensor
 from logpy.LogPy import Logger
+
+from communication.communication import Communication
+
+#Sensors imports
+from communication.rpi_drivers import ports
+from sensors.distance.distance import DistanceSensor
+from sensors.hydrophones.hydrophones import HydrophonesPair
+from sensors.depth.depth import DepthSensor
+from sensors.ahrs.ahrs import AHRS
+
+#Control imports
+from control.movements.movements import Movements
 '''
 Main object (thread) provides all sensors objects
 and passes them to new thread Communication.
@@ -35,16 +36,27 @@ class Main():
         Creates and stores references of all slave objects.
         '''
         self.logger = Logger(filename='main',directory='',logtype='info',timestamp='%Y-%m-%d | %H:%M:%S.%f',logformat='[{timestamp}] {logtype}:    {message}',prefix='',postfix='',title='Main Logger',logexists='append',console=False)
-        self.ahrs = AHRS(main_logger = self.logger, local_log = True)
-        #self.depth = DepthSensor(main_logger = self.logger, local_log = True)
-        #self.depth.run()
-        self.logger.start()
-        self.ahrs.run()
         
+        self.ahrs = AHRS(port = ports.AHRS_CLIENT_PORT,main_logger = self.logger, local_log = True)
+        self.depth = DepthSensor(port = ports.DEPTH_CLIENT_PORT,
+        main_logger = self.logger, local_log = True)
+        self.hydrophones = HydrophonesPair(port =ports.HYDRO_CLIENT_PORT,
+        main_logger = self.logger, local_log =True)
+        self.distance = DistanceSensor(port = ports.DISTANCE_CLIENT_PORT,
+        main_logger = self.logger, local_log = True)
+
+        self.logger.start()
+
+        self.depth.run()
+        self.ahrs.run()
+        self.hydrophones.run()
+        self.distance.run()
+
         self.sensors_refs = {
-            'Movements':''),
-            #'AHRS':self.ahrs,
-            #'DepthSensor':self.depth
+            'AHRS':self.ahrs,
+            'DepthSensor':self.depth,
+            'HydrophonesPair':self.hydrophones,
+            'DistanceSensor':self.distance
         }
         #Here you can add more feature classes
         #Remeber then to provide proper Communication class methods

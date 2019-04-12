@@ -1,5 +1,4 @@
 from sensors.distance.distance_itf import IDistanceSensor
-#from distance_itf import IDistanceSensor
 
 class DistanceSensor(IDistanceSensor):
     '''
@@ -13,4 +12,4 @@ class DistanceSensor(IDistanceSensor):
         '''
         return self.get_data()
     def getter2msg(self):
-        pass
+        return str(self.get_data())

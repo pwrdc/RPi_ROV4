@@ -1,10 +1,12 @@
 import rov_comm
 import datetime
-import settings
 import ast
 
-driver = rov_comm.Client(settings.imu_driver_port)
-client = rov_comm.Client(settings.imu_client_port)
+CLIENT_PORT = 1234
+DRIVER_PORT = 1235
+
+driver = rov_comm.Client(DRIVER_PORT)
+client = rov_comm.Client(CLIENT_PORT)
 
 if not (driver.connection_on is True and client.connection_on is True):
     print("server down")
@@ -17,4 +19,3 @@ else:
         #print(type(data))
 
 print("Goodbye")
-
