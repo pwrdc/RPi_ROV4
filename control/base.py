@@ -10,7 +10,7 @@ class Base():
     All controllers in sensors directory should inherit from this class
     """
     def __init__(self, main_logger=None, local_log=False,
-    log_directory="",log_timing=0.5):
+                 log_directory="", log_timing=0.5):
         """
         :param main_logger: reference to external logger
         :param local_log: create local file with logs
@@ -21,13 +21,12 @@ class Base():
         #self.getter2msg = None
         if local_log:
             self.local_logger = Logger(filename=self.__class__.__name__.lower(),
-                                   directory=log_directory,
-                                   title=self.__class__.__name__,
-                                   external_function=self.getter2msg,
-                                   internal_logger_time=log_timing)
-        
+                                       directory=log_directory,
+                                       title=self.__class__.__name__,
+                                       external_function=self.getter2msg,
+                                       internal_logger_time=log_timing)
         self.local_logger_lock = Lock()
-    
+
     def run(self):
         """
         This method is called by main thread to start
@@ -66,7 +65,6 @@ class Base():
         if self.local_logger:
             self.local_logger.log(msg, logtype)
 
-    '''
     @staticmethod
     def multithread_method(function):
         """
@@ -75,11 +73,9 @@ class Base():
         """
         def wrapper(self, *args):
             with self.local_logger_lock:
-                function(self, args)
+                return function(self, *args)
         return wrapper
-        #Dominik W. - please check if indents are ok
-    '''
-    '''
+
     @abc.abstractmethod
     def getter2msg(self):
         """
@@ -87,4 +83,3 @@ class Base():
         :return: string containing single log message
         """
         pass
-    '''
