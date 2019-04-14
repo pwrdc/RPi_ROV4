@@ -1,5 +1,5 @@
 from logpy.LogPy import Logger
-
+import threading
 from communication.communication import Communication
 
 #Sensors imports
@@ -41,7 +41,7 @@ class Main():
         '''
         self.logger = Logger(filename='main',directory='',logtype='info',timestamp='%Y-%m-%d | %H:%M:%S.%f',logformat='[{timestamp}] {logtype}:    {message}',prefix='',postfix='',title='Main Logger',logexists='append',console=False)
         
-        """
+        
         #Sensors initialization
         self.ahrs = AHRS(port = ports.AHRS_CLIENT_PORT,main_logger = self.logger, local_log = True)
         self.depth = DepthSensor(port = ports.DEPTH_CLIENT_PORT,
@@ -54,31 +54,29 @@ class Main():
         #Controls initialization
         self.movements = Movements(port = ports.ENGINE_SLAVE_PORT,
         depth_sensor_ref = self.depth, ahrs_ref = self.ahrs, main_logger = self.logger)
-        """
         self.lights = Lights (port = ports.LIGHTS_CLIENT_PORT,
         main_logger = self.logger)
-        """
         self.manipulator = Manipulator(port = ports.MANIP_CLIENT_PORT,
         main_logger = self.logger)
         self.torpedoes = Torpedoes(port = ports.TORPEDO_CLIENT_PORT,main_logger=self.logger)
         #controls don't have to be run if they don't start local loggers
 
-        self.logger.start()
+        
 
         self.depth.run()
         self.ahrs.run()
         self.hydrophones.run()
         self.distance.run()
-        """
+        self.logger.start()
         self.sensors_refs = {
-            #'AHRS':self.ahrs,
-            #'DepthSensor':self.depth,
-            #'HydrophonesPair':self.hydrophones,
-            #'DistanceSensor':self.distance,
-            #'Movements':self.movements,
+            'AHRS':self.ahrs,
+            'DepthSensor':self.depth,
+            'HydrophonesPair':self.hydrophones,
+            'DistanceSensor':self.distance,
+            'Movements':self.movements,
             'Lights':self.lights,
-            #'Manipulator':self.manipulator,
-            #'Torpedoes':self.torpedoes
+            'Manipulator':self.manipulator,
+            'Torpedoes':self.torpedoes
         }
         #Here you can add more feature classes
         #Remeber then to provide proper Communication class methods

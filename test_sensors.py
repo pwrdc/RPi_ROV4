@@ -1,3 +1,6 @@
+"""
+Separate test for sensors ZMQ communication
+"""
 from sensors.distance.distance import DistanceSensor
 from sensors.depth.depth import DepthSensor
 from sensors.ahrs.ahrs import AHRS

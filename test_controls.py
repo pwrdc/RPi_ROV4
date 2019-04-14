@@ -1,3 +1,6 @@
+'''
+Separate test for control ZMQ communication
+'''
 from control.lights.lights import Lights
 from control.manipulator.manipulator import Manipulator
 from control.torpedoes.torpedoes import Torpedoes

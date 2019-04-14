@@ -17,7 +17,7 @@ class Communication(threading.Thread):
         self.main_logger = main_logger
         self.log_directory = log_directory
         threading.Thread.__init__(self)
-        self.refs = sensors_refs
+        self.sensors_refs = sensors_refs
 
         #sensor_refs is used to store references to all objects passed from main thread
 
@@ -42,8 +42,7 @@ class Communication(threading.Thread):
         daemon.requestLoop()
         #Starting Pyro4 server loop
         
-        
-        def metoda(self):
-            self.refs['Lights'].power_lights(10)
-        
+    def do(self,command):
+        exec(command)
+
 
