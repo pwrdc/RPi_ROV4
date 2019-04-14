@@ -13,8 +13,9 @@ class Movements(IMovements):
     """
     Interfce for algorithm for accesing rpi Movement Class
     """
-    def __init__(self,port, depth_sensor_ref, ahrs_ref):
-        super().__init__(port = port)
+    def __init__(self,port, depth_sensor_ref, ahrs_ref, main_logger=None,
+    local_log=False):
+        super().__init__(port = port, main_logger=main_logger,local_log=local_log)
         #self.pid = PID(self._set_engine_driver_values, depth_sensor_ref.get_depth, ahrs_ref, LOOP_DELAY)
 
     def set_lin_velocity(self, front, right, up):

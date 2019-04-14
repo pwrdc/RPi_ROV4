@@ -29,7 +29,7 @@ class BaseController(Base):
         self.connection_on = True
     
     def reboot(self):
-        print("rebooting")
+        print("rebooting",self)
         self.context = zmq.Context()
         print("Trying to reconnect…")
         self.socket = self.context.socket(zmq.REQ)

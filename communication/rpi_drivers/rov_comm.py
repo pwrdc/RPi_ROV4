@@ -60,7 +60,7 @@ class ZMQ_Server():
                 except Exception as e:
                     print('Probably wrong data type, exception:',e)
                 
-                print(self.data) #COMMENT AFTER TESTS
+                #print(self.data) #COMMENT AFTER TESTS
 
                 #print("Driver connected...")
                 self.driver_socket.send(b"thanks")  # ,zmq.NOBLOCK)

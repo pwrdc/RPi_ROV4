@@ -18,6 +18,7 @@ class Communication(threading.Thread):
         self.log_directory = log_directory
         threading.Thread.__init__(self)
         self.refs = sensors_refs
+
         #sensor_refs is used to store references to all objects passed from main thread
 
         daemon = Pyro4.Daemon(str(rpi_address))
@@ -32,6 +33,7 @@ class Communication(threading.Thread):
         try:
             name_server.register('RPI_communication',daemon.register(self))
             #Tries to register self object in Pyro4 nameserver as 'RPI_communication'
+            print('RPI registered in Pyro')
 
         except Exception as err:
             main_logger.log('Problem with communication '+str(err))
@@ -39,4 +41,9 @@ class Communication(threading.Thread):
         main_logger.log('Communication server set correctly')
         daemon.requestLoop()
         #Starting Pyro4 server loop
+        
+        
+        def metoda(self):
+            self.refs['Lights'].power_lights(10)
+        
 
