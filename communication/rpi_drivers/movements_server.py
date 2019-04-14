@@ -1,5 +1,5 @@
 import rov_comm
-import communication.rpi_drivers.ports as ports
+import ports
 
 example ={
     'front':0,

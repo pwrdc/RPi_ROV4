@@ -2,8 +2,6 @@
 
 Module includes Movemnets clas
 """
-from communication.rpi_drivers.rov_comm import Client
-from communication.rpi_drivers.ports import ENGINE_MASTER_PORT
 from control.movements.movements_itf import IMovements
 from control.pid.pid import PID
 
@@ -15,10 +13,9 @@ class Movements(IMovements):
     """
     Interfce for algorithm for accesing rpi Movement Class
     """
-    def __init__(self, depth_sensor_ref, ahrs_ref):
-        super().__init__()
-        self.client = Client(ENGINE_MASTER_PORT)
-        self.pid = PID(self._set_engine_driver_values, depth_sensor_ref.get_depth, ahrs_ref, LOOP_DELAY)
+    def __init__(self,port, depth_sensor_ref, ahrs_ref):
+        super().__init__(port = port)
+        #self.pid = PID(self._set_engine_driver_values, depth_sensor_ref.get_depth, ahrs_ref, LOOP_DELAY)
 
     def set_lin_velocity(self, front, right, up):
         """
@@ -59,17 +56,17 @@ class Movements(IMovements):
         pass
 
     def _set_engine_driver_values(self, front, right, up, roll, pitch, yaw):
-        self.client.send_data(self.to_dict(front, right, up, roll, pitch, yaw))
+        self._send_data(self.to_dict(front, right, up, roll, pitch, yaw))
 
     def to_dict(self, front=None, right=None, up=None, roll=None,
         pitch=None, yaw=None):
         '''
         Converting data to dictionary
         '''
-        dic = locals()
-        for i in dic:
-            if i == None:
-                del i
+        dic = {}
+        for key,value in locals().items():
+            if key != 'self' and key != 'dic' and value != None:
+                dic[key] = value
         return dic
 
 if __name__=='__main__':

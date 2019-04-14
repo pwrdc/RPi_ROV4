@@ -34,11 +34,11 @@ class ZMQ_Server():
         self.driver_socket.setsockopt(zmq.RCVTIMEO, timeout)
         self.client_socket.setsockopt(zmq.RCVTIMEO, timeout)
 
-        self.driver_adress = "tcp://*:" + str(driver_port)
-        self.client_adress = "tcp://*:" + str(client_port)
+        self.driver_adress = "tcp://*:" + str(client_port)
+        self.client_adress = "tcp://*:" + str(driver_port)
 
-        self.driver_socket.bind(self.driver_adress)
-        self.client_socket.bind(self.client_adress)
+        self.driver_socket.bind(self.driver_adress) #bug with ports
+        self.client_socket.bind(self.client_adress) #communication works with oppposite ports
 
 
         print("Server active...")
@@ -56,11 +56,11 @@ class ZMQ_Server():
                 self.data = self.driver_socket.recv()  # zmq.NOBLOCK)
                 try:
                     self.data = self.data.decode("utf-8")
-                    self.data = ast.literal_eval(self.data)
+                    #self.data = ast.literal_eval(self.data)
                 except Exception as e:
                     print('Probably wrong data type, exception:',e)
                 
-                #print(self.data)
+                print(self.data) #COMMENT AFTER TESTS
 
                 #print("Driver connected...")
                 self.driver_socket.send(b"thanks")  # ,zmq.NOBLOCK)
@@ -120,7 +120,8 @@ class Client():
             #print("Sending request...")
             message = self.socket.recv()
             message = message.decode("utf-8")
-            message = ast.literal_eval(data)
+            if message[0] == '{':
+                message = ast.literal_eval(message)  #parsing dicts only
             #print("Received reply:", message)
             self.server_up = True
             return message

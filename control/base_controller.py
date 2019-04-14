@@ -36,3 +36,16 @@ class BaseController(Base):
         self.socket.setsockopt(zmq.RCVTIMEO, self.timeout)
         self.socket.connect("tcp://localhost:" + str(self.port))
 
+    def _send_data(self,data):
+        try:
+            self.socket.send(bytes(str(data), 'utf-8'))
+            #print("Sending data...")
+            message = self.socket.recv()  # zmq.NOBLOCK)
+            #print("Received reply:", message)
+            self.server_up = True
+        except zmq.ZMQError:
+            self.server_up = False
+            #print("Server_down")
+        if self.server_up is False:
+            self.reboot()
+
