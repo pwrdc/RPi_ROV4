@@ -17,7 +17,7 @@ class AHRS(BaseSensor,IAHRS):
     def getter2msg(self):
         return str(self.get_data())
 
-    #@IAHRS.multithread_method
+    #@Base.multithread_method
     def get_rotation(self):
         '''
         :return: dict with keys: 'yaw', 'pitch', 'roll'
@@ -32,7 +32,7 @@ class AHRS(BaseSensor,IAHRS):
         else:
             return None
 
-    #@IAHRS.multithread_method
+    #@Base.multithread_method
     def get_linear_accelerations(self):
         '''
         :return: dictionary with keys "lineA_x"
@@ -48,7 +48,7 @@ class AHRS(BaseSensor,IAHRS):
         else:
             return None
 
-    #@IAHRS.multithread_method
+    #@Base.multithread_method
     def get_angular_accelerations(self):
         '''
         :return: dictionary with keys "angularA_x"
@@ -64,7 +64,7 @@ class AHRS(BaseSensor,IAHRS):
         else:
             return None
 
-    #@IAHRS.multithread_method
+    #@Base.multithread_method
     def get_all_data(self):
         '''
         :return: dictionary with rotation, linear and angular

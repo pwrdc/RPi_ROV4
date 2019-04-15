@@ -6,7 +6,7 @@ class HydrophonesPair(BaseSensor,IHydrophonesPair):
     Class to handle hydrophones signal and
     calculate angle
     '''
-    #@IHydrophonesPair.multithread_method
+    #@Base.multithread_method
     def get_angle(self):
         return self.get_data()
 

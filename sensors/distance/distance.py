@@ -4,7 +4,7 @@ from sensors.base_sensor import BaseSensor
 class DistanceSensor(BaseSensor,IDistanceSensor):
     '''
     '''
-    #@IDistanceSensor.multithread_method
+    #@Base.multithread_method
     def get_front_distance(self):
         '''
         Get distance from obstacle in front of ROV
