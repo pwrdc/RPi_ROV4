@@ -1,7 +1,7 @@
 from sensors.hydrophones.hydrophones_itf import IHydrophonesPair
+from sensors.base_sensor import BaseSensor
 
-
-class HydrophonesPair(IHydrophonesPair):
+class HydrophonesPair(BaseSensor,IHydrophonesPair):
     '''
     Class to handle hydrophones signal and
     calculate angle

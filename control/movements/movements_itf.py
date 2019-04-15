@@ -2,10 +2,9 @@
 Module includes IMovements
 """
 import abc
-from control.base_controller import BaseController
 
 
-class IMovements(BaseController, metaclass=abc.ABCMeta):
+class IMovements(metaclass=abc.ABCMeta):
     """
     Interfce for control ROV movements
     """

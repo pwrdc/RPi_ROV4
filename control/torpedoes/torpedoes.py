@@ -1,6 +1,7 @@
 from control.torpedoes.torpedoes_itf import ITorpedoes
+from control.base_controller import BaseController
 
-class Torpedoes(ITorpedoes):
+class Torpedoes(BaseController,ITorpedoes):
     def is_torpedo_ready(self):
         pass
 

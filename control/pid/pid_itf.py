@@ -1,8 +1,7 @@
-from control.base import Base
 from threading import Thread
 import abc
 
-class IPID(Base):
+class IPID():
     @abc.abstractclassmethod
     def set_velocities(self, front=None, right=None, up=None, yaw=None):
         """

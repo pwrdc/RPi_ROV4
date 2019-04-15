@@ -2,10 +2,10 @@
 Module includes interface for ahrs
 """
 import abc
-from sensors.base_sensor import BaseSensor
 
 
-class IAHRS(BaseSensor):
+
+class IAHRS():
     """
     Class for getting data from ahrs sensor
     """

@@ -2,10 +2,9 @@
 Module includes interface for depth sensor
 """
 import abc
-from sensors.base_sensor import BaseSensor
 
 
-class IDepthSensor(BaseSensor):
+class IDepthSensor():
     """
     Class for getting data from depth sensor by use of virtual file
     """

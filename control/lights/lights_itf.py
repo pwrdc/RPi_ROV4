@@ -2,10 +2,10 @@
 Module includes interface for Lights class
 """
 import abc
-from control.base_controller import BaseController
 
 
-class ILights(BaseController, metaclass=abc.ABCMeta):
+
+class ILights(metaclass=abc.ABCMeta):
     """
     Interfce for control ROV's lights
     """

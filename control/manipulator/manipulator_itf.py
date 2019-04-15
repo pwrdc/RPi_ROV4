@@ -1,8 +1,7 @@
 import abc
-from control.base_controller import BaseController
 
 
-class IManipulator(BaseController, metaclass=abc.ABCMeta):
+class IManipulator(metaclass=abc.ABCMeta):
     """
     Interface for manipulator control
     """

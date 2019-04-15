@@ -4,12 +4,13 @@ Module includes Movemnets clas
 """
 from control.movements.movements_itf import IMovements
 from control.pid.pid import PID
+from control.base_controller import BaseController
 
 LOOP_DELAY = 0.05
 
 # TODO - delete or move pyro server to communication (replace or integrate with communication for xavier)
 
-class Movements(IMovements):
+class Movements(BaseController,IMovements):
     """
     Interfce for algorithm for accesing rpi Movement Class
     """

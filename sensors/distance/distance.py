@@ -1,6 +1,7 @@
 from sensors.distance.distance_itf import IDistanceSensor
+from sensors.base_sensor import BaseSensor
 
-class DistanceSensor(IDistanceSensor):
+class DistanceSensor(BaseSensor,IDistanceSensor):
     '''
     '''
     #@IDistanceSensor.multithread_method

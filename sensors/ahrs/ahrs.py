@@ -1,4 +1,5 @@
 from sensors.ahrs.ahrs_itf import IAHRS
+from sensors.base_sensor import BaseSensor
 """
 from sensors.ahrs.ahrs_separate import AHRS_Separate
 from sensors.ahrs.ahrs_virtual import AHRSvirtual
@@ -6,7 +7,7 @@ from threading import Thread
 """
 
 
-class AHRS(IAHRS):
+class AHRS(BaseSensor,IAHRS):
     '''
     class for accessing AHRS data using direct access to ahrs thread
     If AHRS is disconected use virtual class to returning only zeros

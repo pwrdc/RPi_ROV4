@@ -2,10 +2,9 @@
 Module includes interface for hydrophones class
 """
 import abc
-from sensors.base_sensor import BaseSensor
 
 
-class IHydrophonesPair(BaseSensor, metaclass=abc.ABCMeta):
+class IHydrophonesPair(metaclass=abc.ABCMeta):
     """
     Interface for pair of hydrophones class
     """

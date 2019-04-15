@@ -1,7 +1,8 @@
 from control.pid.pid_itf import IPID
 from threading import Thread
+from control.base import Base
 
-class PID(IPID):
+class PID(Base,IPID):
     def __init__(self, set_engine_driver_fun, get_depth_fun, ahrs, loop_delay, 
         main_logger=None, local_log=False, log_directory="",log_timing=0.5):
         '''
@@ -13,7 +14,7 @@ class PID(IPID):
         @param ahrs: reference to AHRS object
                 (see AHRS in sensors/ahrs/ahrs_itf.py)
         '''
-        super().__init__(main_logger, local_log, log_directory,log_timing)
+        super(Base,self).__init__(main_logger, local_log, log_directory,log_timing)
         self.set_engine_driver_fun = set_engine_driver_fun
         self.get_depth_fun = get_depth_fun
         self.ahrs = ahrs

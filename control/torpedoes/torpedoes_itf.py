@@ -2,10 +2,9 @@
 Module includes ITorpedoes
 """
 import abc
-from control.base_controller import BaseController
 
 
-class ITorpedoes(BaseController, metaclass=abc.ABCMeta):
+class ITorpedoes(metaclass=abc.ABCMeta):
     """
     Interfce for control ROV's torpedo launcher
     """

@@ -1,7 +1,8 @@
 from sensors.depth.depth_itf import IDepthSensor
+from sensors.base_sensor import BaseSensor
 
 
-class DepthSensor(IDepthSensor):
+class DepthSensor(BaseSensor,IDepthSensor):
     '''
     Depth sensor
     Use rpi server to accessing data from sensor
