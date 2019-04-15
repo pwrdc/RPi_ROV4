@@ -7,7 +7,8 @@ class Manipulator(BaseController,IManipulator):
         """
         Control ROV's robotic arm
         """
-        self._send_data([first_param,second_param])
+        param = str(first_param)+','+str(second_param)
+        self._send_data(param)
 
     def getter2msg(self):
         return 0

@@ -1,5 +1,6 @@
 from sensors.ahrs.ahrs_itf import IAHRS
 from sensors.base_sensor import BaseSensor
+import ast
 """
 from sensors.ahrs.ahrs_separate import AHRS_Separate
 from sensors.ahrs.ahrs_virtual import AHRSvirtual
@@ -23,8 +24,10 @@ class AHRS(BaseSensor,IAHRS):
         :return: dict with keys: 'yaw', 'pitch', 'roll'
         '''
         received = self.get_data()
+        print(received)
         output = {}
-        if received != None:
+        if received != None and received[0] == '{':
+            received = ast.literal_eval(received)
             output['yaw'] = received['yaw']
             output['pitch'] = received['pitch']
             output['roll'] = received['roll']
@@ -40,7 +43,9 @@ class AHRS(BaseSensor,IAHRS):
         '''
         received = self.get_data()
         output = {}
-        if received != None:
+        print(received)
+        if received != None and received[0] == '{':
+            received = ast.literal_eval(received)
             output['lineA_x'] = received['lineA_x']
             output['lineA_y'] = received['lineA_y']
             output['lineA_z'] = received['lineA_z']
@@ -56,7 +61,9 @@ class AHRS(BaseSensor,IAHRS):
         '''
         received = self.get_data()
         output = {}
-        if received != None:
+        print(received)
+        if received != None and received[0] == '{':
+            received = ast.literal_eval(received)
             output['angularA_x'] = received['angularA_x']
             output['angularA_y'] = received['angularA_x']
             output['angularA_z'] = received['angularA_x']

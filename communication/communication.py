@@ -81,9 +81,9 @@ IMovements,ITorpedoes,IAHRS,IDepthSensor,IDistanceSensor,IHydrophonesPair):
             roll, pitch, yaw
         )
 
-    def _set_engine_driver_values(self, front, right,
+    def set_engine_driver_values(self, front, right,
     up, roll, pitch, yaw):
-        self.sensors_refs['Movements']._set_engine_driver_values(
+        self.sensors_refs['Movements'].set_engine_driver_values(
             front, right, up, roll, pitch, yaw
         )
 

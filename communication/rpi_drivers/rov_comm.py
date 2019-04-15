@@ -1,7 +1,6 @@
 import zmq
 import time
 import ast
-import zmq
 
 class ZMQ_Server():
     """
@@ -34,8 +33,8 @@ class ZMQ_Server():
         self.driver_socket.setsockopt(zmq.RCVTIMEO, timeout)
         self.client_socket.setsockopt(zmq.RCVTIMEO, timeout)
 
-        self.driver_adress = "tcp://*:" + str(client_port)
-        self.client_adress = "tcp://*:" + str(driver_port)
+        self.driver_adress = "tcp://*:" + str(driver_port)
+        self.client_adress = "tcp://*:" + str(client_port)
 
         self.driver_socket.bind(self.driver_adress) #bug with ports
         self.client_socket.bind(self.client_adress) #communication works with oppposite ports
@@ -60,7 +59,7 @@ class ZMQ_Server():
                 except Exception as e:
                     print('Probably wrong data type, exception:',e)
                 
-                print(self.data) #COMMENT AFTER TESTS
+                #print(self.data) COMMENT AFTER TESTS
 
                 #print("Driver connected...")
                 self.driver_socket.send(b"thanks")  # ,zmq.NOBLOCK)
