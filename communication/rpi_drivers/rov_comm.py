@@ -53,6 +53,7 @@ class ZMQ_Server():
             time.sleep(self.sleep_time)
             try:
                 self.data = self.driver_socket.recv()  # zmq.NOBLOCK)
+                print(self.data)
                 try:
                     self.data = self.data.decode("utf-8")
                     #self.data = ast.literal_eval(self.data)

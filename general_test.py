@@ -25,7 +25,12 @@ try:
     RPI.power_lights(10)
     print('After power lights')
     time.sleep(1)
+    
+
     RPI.set_movements(1,2)
+
+
+
     print('After set movements')
     time.sleep(1)
     RPI.set_lin_velocity(3,4,5)
