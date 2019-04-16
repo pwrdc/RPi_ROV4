@@ -59,7 +59,7 @@ class Movements(BaseController,IMovements):
 
     def set_engine_driver_values(self, front, right, up, roll, pitch, yaw):
         self._send_data(self.to_dict(front, right, up, roll, pitch, yaw))
-        print('Data sent')
+        #print('Data sent')
 
     def to_dict(self, front=None, right=None, up=None, roll=None,
         pitch=None, yaw=None):
