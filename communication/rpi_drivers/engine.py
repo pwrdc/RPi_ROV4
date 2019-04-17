@@ -17,7 +17,7 @@ class EngineDriver():
     set_dict = {"fl" : False, "fr" : False, "bl" : False, "br" : False,"vl" : False,"vr" : False,"vb" : False}
     old_dict = {"fl" : 192, "fr" : 192, "bl" : 192, "br" : 192, "vl" : 192, "vr" : 192, "vb" : 192}
     def __init__(self):
-        self.engines_dict = {"fl" : 12, "fr" : 3, "bl" : 4, "br" : 5,"vl" : 6,"vr" : 7,"vb" : 8}
+        self.engines_dict = {"fl" : 19, "fr" : 12, "bl" : 26, "br" : 21,"vl" : 13,"vr" : 16,"vb" : 20}
         self._load_map_file()
 
         self.pi = pigpio.pi()

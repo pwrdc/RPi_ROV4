@@ -97,4 +97,4 @@ if __name__== "__main__":
     main = Main()
     main.comm.start()
     main.comm.join()
-    #Starting and waiting for infinite thread Communication to finish
+    #St
