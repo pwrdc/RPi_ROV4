@@ -17,7 +17,7 @@ class Movements(BaseController,IMovements):
     def __init__(self,port, depth_sensor_ref, ahrs_ref, main_logger=None,
     local_log=False):
         super().__init__(port = port, main_logger=main_logger,local_log=local_log)
-        #self.pid = PID(self._set_engine_driver_values, depth_sensor_ref.get_depth, ahrs_ref, LOOP_DELAY)
+        self.pid = PID(self._set_engine_driver_values, depth_sensor_ref.get_depth, ahrs_ref, LOOP_DELAY)
 
     def set_lin_velocity(self, front, right, up):
         """
@@ -73,5 +73,5 @@ class Movements(BaseController,IMovements):
         return dic
 
 if __name__=='__main__':
-    movements = Movements(None, None)
+    movements = Movements(None,None, None)
     print(movements.to_dict(12, 14, 15))
