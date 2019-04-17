@@ -6,23 +6,6 @@ from engine import EngineDriver
 import rov_comm
 import ports
 
-if __name__ == '__main__':
-    engine_driver = EngineDriver()
-    engine_slave = rov_comm.Client(ports.ENGINE_SLAVE_PORT)
-    print ("a")
-    while True:
-        try:
-            string = str(engine_slave.get_data().decode("utf-8")) #robimy z byte na string
-            #string = string[2:-1] # i tak zostaje b"tekst", po tej instrukcji zostanie tekst
-            dictionary = ast.literal_eval(string) #robimy dict
-            #print(dictionary)
-            powers = compute_power(dictionary['front'],dictionary['right'],
-            dictionary['up'],dictionary['yaw'])
-            engine_driver.set_engines(powers) #wrzucamy dict na silniki
-        except Exception as e:
-            print(e)
-            time.sleep(5)
-
 def compute_power(front, right, up, yaw):
     """
     front, right, up, yaw [-1,1]
@@ -64,3 +47,22 @@ def compute_power(front, right, up, yaw):
     }
     
     return motor_powers
+
+engine_driver = EngineDriver()
+engine_slave = rov_comm.Client(ports.ENGINE_MASTER_PORT)
+print ("a")
+while True:
+    try:
+        string = engine_slave.get_data() #robimy z byte na string
+        #print('Typ zmiennej string',type(string),string)
+        #string = string[2:-1] # i tak zostaje b"tekst", po tej instrukcji zostanie tekst
+        #dictionary = ast.literal_eval(string) #robimy dict
+        #print(dictionary)
+        powers = compute_power(string['front'],string['right'],
+        string['up'],string['yaw'])
+        #print('dictionary type',type(dictionary),dictionary)
+        engine_driver.set_engines(powers) #wrzucamy dict na silniki
+    except Exception as e:
+        print(e)
+        time.sleep(5)
+
