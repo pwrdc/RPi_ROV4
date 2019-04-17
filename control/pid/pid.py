@@ -1,8 +1,9 @@
 from control.pid.pid_itf import IPID
 from sensors.depth.depth_itf import IDepthSensor
-from threading import Thread
+from threading import Thread, Lock
 import time
 
+UP_MARGIN = 0.04
 
 class PID(IPID):
     def __init__(self,
@@ -32,6 +33,9 @@ class PID(IPID):
         self.get_depth_fun = get_depth_fun
         self.ahrs = ahrs
         self.sample_time = loop_delay
+        self.pid_loop_lock = Lock()
+        self.close_bool = False
+
         self.current_time = time.time()
         self.last_time = self.current_time
         self.Kp = kp
@@ -39,9 +43,6 @@ class PID(IPID):
         self.Kd = kd
 
         self.clear()
-
-    def get_depth_fun():
-        return IDepthSensor.get_depth()
 
     def clear(self):
         '''
@@ -88,12 +89,38 @@ class PID(IPID):
 
     def run(self):
         super().run()
-        thread = Thread(target=self.update(self.get_depth_fun()))
-        # TODO replace pid_loop with your local method with main loop
+        thread = Thread(target=self.pid_loop)
         thread.run()
+
+    def close(self):
+        super().close()
+        with self.pid_loop_lock:
+            self.close_bool = True
 
     def hold_depth(self):
         self.SetPoint = self.get_depth_fun()
 
     def set_depth(self, depth):
         self.SetPoint = depth
+
+    def pid_loop(self):
+        while True:
+            self.update(self.get_depth_fun())
+            time.sleep(self.sample_time)
+            with self.pid_loop_lock:
+                if self.close_bool:
+                    break
+
+    @staticmethod
+    def val_to_range(val):
+        if val < -1.0:
+            return -1.0
+        if val > 1.0:
+            return 1.0
+        return val
+
+    def set_velocities(self, front=0, right=0, up=0, roll=0, pitch=0, yaw=0):
+        if up<UP_MARGIN and up > -UP_MARGIN:
+            self.set_engine_driver_fun(front, right, up, roll, pitch, yaw)
+        else:
+            self.set_engine_driver_fun(front, right, self.val_to_range(self.output), roll, pitch, yaw)
