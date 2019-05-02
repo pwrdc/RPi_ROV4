@@ -1,11 +1,11 @@
-from control.pid.pid_itf import IPID
-from sensors.depth.depth_itf import IDepthSensor
-from threading import Thread, Lock
 import time
+from threading import Thread, Lock
+from control.base import Base
+from control.pid.pid_itf import IPID
 
 UP_MARGIN = 0.04
 
-class PID(IPID):
+class PID(Base, IPID):
     def __init__(self,
                  set_engine_driver_fun,
                  get_depth_fun,
@@ -28,12 +28,15 @@ class PID(IPID):
         @param ahrs: reference to AHRS object
                 (see AHRS in sensors/ahrs/ahrs_itf.py)
         '''
-        super().__init__(main_logger, local_log, log_directory, log_timing)
+        super(PID, self).__init__(main_logger, local_log, log_directory)
         self.set_engine_driver_fun = set_engine_driver_fun
         self.get_depth_fun = get_depth_fun
         self.ahrs = ahrs
         self.sample_time = loop_delay
         self.pid_loop_lock = Lock()
+        self.pid_active_lock = Lock()
+        self.pid_active = False
+
         self.close_bool = False
 
         self.current_time = time.time()
@@ -111,6 +114,14 @@ class PID(IPID):
                 if self.close_bool:
                     break
 
+    def turn_on_pid(self):
+        with self.pid_active_lock:
+            self.pid_active = True
+
+    def turn_off_pid(self):
+        with self.pid_active_lock:
+            self.pid_active = False
+
     @staticmethod
     def val_to_range(val):
         if val < -10.0:
@@ -120,7 +131,8 @@ class PID(IPID):
         return val/10.0
 
     def set_velocities(self, front=0, right=0, up=0, roll=0, pitch=0, yaw=0):
-        if up<UP_MARGIN and up > -UP_MARGIN:
-            self.set_engine_driver_fun(front, right, up, roll, pitch, yaw)
-        else:
-            self.set_engine_driver_fun(front, right, self.val_to_range(self.output), roll, pitch, yaw)
+        with self.pid_active_lock:
+            if (up<UP_MARGIN and up > -UP_MARGIN) or not self.pid_active:
+                self.set_engine_driver_fun(front, right, up, roll, pitch, yaw)
+            else:
+                self.set_engine_driver_fun(front, right, self.val_to_range(self.output), roll, pitch, yaw)

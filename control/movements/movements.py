@@ -10,14 +10,13 @@ LOOP_DELAY = 0.05
 
 # TODO - delete or move pyro server to communication (replace or integrate with communication for xavier)
 
-class Movements(BaseController,IMovements):
+class Movements(BaseController, IMovements):
     """
     Interfce for algorithm for accesing rpi Movement Class
     """
-    def __init__(self,port, depth_sensor_ref, ahrs_ref, main_logger=None,
-    local_log=False):
-        super().__init__(port = port, main_logger=main_logger,local_log=local_log)
-        self.pid = PID(self._set_engine_driver_values, depth_sensor_ref.get_depth, ahrs_ref, LOOP_DELAY)
+    def __init__(self, port, depth_sensor_ref, ahrs_ref, main_logger=None, local_log=False):
+        super(Movements, self).__init__(port=port, main_logger=main_logger, local_log=local_log)
+        self.pid = PID(self.set_engine_driver_values, depth_sensor_ref.get_depth, ahrs_ref, LOOP_DELAY)
 
     def set_lin_velocity(self, front, right, up):
         """
@@ -26,7 +25,7 @@ class Movements(BaseController,IMovements):
         @param: right int in range [-100, 100], case negative value move down
         @param: up int in range [-100,100], case negative value move down
         """
-        #self.pid.set_velocities(front, right, up)
+        self.pid.set_velocities(front, right, up)
 
     def set_ang_velocity(self, roll, pitch, yaw):
         """
@@ -35,7 +34,7 @@ class Movements(BaseController,IMovements):
         @param: pitch int in range [-100, 100], case negative - reverse direction
         @param: yaw int in range [-100,100], case negative - reverse direction
         """
-        #self.pid.set_velocities(yaw=yaw)
+        self.pid.set_velocities(yaw=yaw)
 
     def move_distance(self, front, right, up):
         """
@@ -57,12 +56,25 @@ class Movements(BaseController,IMovements):
         """
         pass
 
+    def pid_hold_depth(self):
+        self.pid.hold_depth()
+
+    def pid_turn_on(self):
+        self.pid_hold_depth() #temporary
+        self.pid.turn_on_pid()
+        self.log("movments: pid_turn_on")
+
+    def pid_turn_off(self):
+        self.pid.turn_off_pid()
+        self.log("movments: pid_turn_off")
+
     def set_engine_driver_values(self, front, right, up, roll, pitch, yaw):
         self._send_data(self.to_dict(front, right, up, roll, pitch, yaw))
         #print('Data sent')
+        msg = "front: "+str(front)+";right: "+str(right)+";up: "+str(up)+";roll: "+str(roll)
+        self.log(msg)
 
-    def to_dict(self, front=None, right=None, up=None, roll=None,
-        pitch=None, yaw=None):
+    def to_dict(self, front=None, right=None, up=None, roll=None, pitch=None, yaw=None):
         '''
         Converting data to dictionary
         '''

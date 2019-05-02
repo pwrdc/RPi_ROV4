@@ -86,6 +86,14 @@ IMovements,ITorpedoes,IAHRS,IDepthSensor,IDistanceSensor,IHydrophonesPair):
         self.sensors_refs['Movements'].set_engine_driver_values(
             front, right, up, roll, pitch, yaw
         )
+    def pid_turn_on(self):
+        self.sensors_refs['Movements'].pid_turn_on()
+    
+    def pid_turn_off(self):
+        self.sensors_refs['Movements'].pid_turn_off()
+
+    def pid_hold_depth(self):
+        self.sensors_refs['Movements'].pid_hold_depth()
 
     def is_torpedo_ready(self):
         return self.sensors_refs['Torpedoes'].is_torpedo_ready()
