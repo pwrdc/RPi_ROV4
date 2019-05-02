@@ -4,16 +4,18 @@ from communication.communication import Communication
 
 #Sensors imports
 from communication.rpi_drivers import ports
-#from sensors.distance.distance import DistanceSensor
-#from sensors.hydrophones.hydrophones import HydrophonesPair
+from sensors.distance.distance import DistanceSensor
+from sensors.hydrophones.hydrophones import HydrophonesPair
 from sensors.depth.depth import DepthSensor
 from sensors.ahrs.ahrs import AHRS
 
 #Control imports
 from control.movements.movements import Movements
-#from control.lights.lights import Lights
-#from control.manipulator.manipulator import Manipulator
-#from control.torpedoes.torpedoes import Torpedoes
+from control.lights.lights import Lights
+from control.manipulator.manipulator import Manipulator
+from control.torpedoes.torpedoes import Torpedoes
+
+from definitions import DEFLOG, SENSORS, CONTROL, RPI_ADDRESS
 '''
 Main object (thread) provides all sensors objects
 and passes them to new thread Communication.
@@ -26,9 +28,6 @@ It is backed by easier use of Communication class from Xavier level.
 
 '''
 
-#definitions
-RPI_ADDRESS = '192.168.0.102'
-#orginally 192.168.0.100
 
 class Main():
     '''
@@ -39,53 +38,84 @@ class Main():
         '''
         Creates and stores references of all slave objects.
         '''
-        self.logger = Logger(filename='main',directory='',logtype='info',timestamp='%Y-%m-%d | %H:%M:%S.%f',logformat='[{timestamp}] {logtype}:    {message}',prefix='',postfix='',title='Main Logger',logexists='append',console=False)
-        
-        
+        self.logger = Logger(filename='main', title="Main")
+
         #Sensors initialization
-        self.ahrs = AHRS(port = ports.AHRS_CLIENT_PORT,main_logger = self.logger, local_log = True)
-        self.depth = DepthSensor(port = ports.DEPTH_CLIENT_PORT,
-        main_logger = self.logger, local_log = True)
-        """
-        self.hydrophones = HydrophonesPair(port =ports.HYDRO_CLIENT_PORT,
-        main_logger = self.logger, local_log =True)
-        self.distance = DistanceSensor(port = ports.DISTANCE_CLIENT_PORT,
-        main_logger = self.logger, local_log = True)
-        """
+        self.ahrs = None
+        self.depth = None
+        self.hydrophones = None
+        self.distance = None
+        if SENSORS.AHRS:
+            self.ahrs = AHRS(port=ports.AHRS_CLIENT_PORT,
+                             main_logger=self.logger,
+                             local_log=DEFLOG.AHRS_LOCAL_LOG,
+                             log_timing=DEFLOG.AHRS_LOG_TIMING)
+        if SENSORS.DEPTH:
+            self.depth = DepthSensor(port=ports.DEPTH_CLIENT_PORT,
+                                     main_logger=self.logger,
+                                     local_log=DEFLOG.DEPTH_LOCAL_LOG,
+                                     log_timing=DEFLOG.DEPTH_LOG_TIMING)
+        if SENSORS.HYDROPHONES:
+            self.hydrophones = HydrophonesPair(port=ports.HYDRO_CLIENT_PORT,
+                                               main_logger=self.logger,
+                                               local_log=DEFLOG.HYDROPHONES_LOCAL_LOG,
+                                               log_timing=DEFLOG.HYDROPHONES_LOG_TIMING)
+        if SENSORS.DISTANCE:
+            self.distance = DistanceSensor(port=ports.DISTANCE_CLIENT_PORT,
+                                           main_logger=self.logger,
+                                           local_log=DEFLOG.DISTANCE_LOCAL_LOG,
+                                           log_timing=DEFLOG.HYDROPHONES_LOG_TIMING)
+
         #Controls initialization
-        self.movements = Movements(port = ports.ENGINE_SLAVE_PORT,
-        depth_sensor_ref = self.depth, ahrs_ref = self.ahrs, main_logger = self.logger)
-        """
-        self.lights = Lights (port = ports.LIGHTS_CLIENT_PORT,
-        main_logger = self.logger)
-        self.manipulator = Manipulator(port = ports.MANIP_CLIENT_PORT,
-        main_logger = self.logger)
-        self.torpedoes = Torpedoes(port = ports.TORPEDO_CLIENT_PORT,main_logger=self.logger)
-        """
-        #controls don't have to be run if they don't start local loggers
-
+        self.lights = None
+        self.manipulator = None
+        self.torpedoes = None
+        self.movements = Movements(port=ports.ENGINE_SLAVE_PORT,
+                                   depth_sensor_ref=self.depth,
+                                   ahrs_ref=self.ahrs,
+                                   main_logger=self.logger,
+                                   local_log=DEFLOG.MOVEMENTS_LOCAL_LOG)
+        if CONTROL.LIGHTS:
+            self.lights = Lights(port=ports.LIGHTS_CLIENT_PORT, main_logger=self.logger)
+        if CONTROL.MANIPULATOR:
+            self.manipulator = Manipulator(port=ports.MANIP_CLIENT_PORT, main_logger=self.logger)
+        if CONTROL.TORPEDOES:
+            self.torpedoes = Torpedoes(port=ports.TORPEDO_CLIENT_PORT, main_logger=self.logger)
         
+        #Run threads, in control for local logers
 
-        self.depth.run()
-        self.ahrs.run()
-        #self.hydrophones.run()
-        #self.distance.run()
         self.logger.start()
+        if SENSORS.DEPTH:
+            self.depth.run()
+        if SENSORS.AHRS:
+            self.ahrs.run()
+        if SENSORS.HYDROPHONES:
+            self.hydrophones.run()
+        if SENSORS.DISTANCE:
+            self.distance.run()
+
+        self.movements.run()
+        if CONTROL.MANIPULATOR:
+            self.manipulator.run()
+        if CONTROL.LIGHTS:
+            self.manipulator.run()
+        if CONTROL.TORPEDOES:
+            self.torpedoes.run()
+        
         self.sensors_refs = {
             'AHRS':self.ahrs,
             'DepthSensor':self.depth,
-            #'HydrophonesPair':self.hydrophones,
-            #'DistanceSensor':self.distance,
-            'Movements':self.movements
-            #'Lights':self.lights,
-            #'Manipulator':self.manipulator,
-            #'Torpedoes':self.torpedoes
+            'HydrophonesPair':self.hydrophones,
+            'DistanceSensor':self.distance,
+            'Movements':self.movements,
+            'Lights':self.lights,
+            'Manipulator':self.manipulator,
+            'Torpedoes':self.torpedoes
         }
         #Here you can add more feature classes
         #Remeber then to provide proper Communication class methods
 
-        self.comm = Communication(self.sensors_refs, RPI_ADDRESS,
-        main_logger = self.logger)
+        self.comm = Communication(self.sensors_refs, RPI_ADDRESS, main_logger=self.logger)
         '''
         Communication class parameters are: sensors_refs, rpi_address,
         main_logger, local_logger, log_directory (last three are optional)

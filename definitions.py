@@ -1,0 +1,29 @@
+RPI_ADDRESS = '192.168.0.100'
+
+class DEFLOG:
+    DEPTH_LOCAL_LOG = True
+    DEPTH_LOG_TIMING = 0.1
+
+    AHRS_LOCAL_LOG = True
+    AHRS_LOG_TIMING = 0.1
+
+    HYDROPHONES_LOCAL_LOG = False
+    HYDROPHONES_LOG_TIMING = 0.1
+
+    DISTANCE_LOCAL_LOG = True
+    DISTANCE_LOG_TIMING = 0.1
+
+    MOVEMENTS_LOCAL_LOG = True
+    MANIPULATOR_LOCAL_LOG = False
+    TORPEDOES_LOCAL_LOG = False
+
+class SENSORS:
+    AHRS = True
+    DEPTH = True
+    HYDROPHONES = False
+    DISTANCE = False
+
+class CONTROL:
+    LIGHTS = False
+    MANIPULATOR = False
+    TORPEDOES = False
