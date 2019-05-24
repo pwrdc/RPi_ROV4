@@ -1,23 +1,20 @@
-"""
-
-Module includes Movemnets clas
-"""
+from control.base import Base
 from control.movements.movements_itf import IMovements
 from control.pid.pid import PID
-from control.base_controller import BaseController
+import Pyro4
 
 LOOP_DELAY = 0.05
 
-# TODO - delete or move pyro server to communication (replace or integrate with communication for xavier)
-
-class Movements(BaseController, IMovements):
+class Movements(Base, IMovements):
     """
     Interfce for algorithm for accesing rpi Movement Class
     """
-    def __init__(self, port, depth_sensor_ref, ahrs_ref, main_logger=None, local_log=False):
-        super(Movements, self).__init__(port=port, main_logger=main_logger, local_log=local_log)
+    def __init__(self, depth_sensor_ref, ahrs_ref, main_logger=None, local_log=False):
+        
+        super(Movements, self).__init__(main_logger=main_logger, local_log=local_log)
         self.pid = PID(self.set_engine_driver_values, depth_sensor_ref.get_depth, ahrs_ref, LOOP_DELAY)
-
+        Pyro4.locateNS()
+        self.engines_driver = Pyro4.Proxu("PYRONAME:engines_driver")
     def set_lin_velocity(self, front, right, up):
         """
         Set linear velocity as 100% of engines power
@@ -69,7 +66,7 @@ class Movements(BaseController, IMovements):
         self.log("movments: pid_turn_off")
 
     def set_engine_driver_values(self, front, right, up, roll, pitch, yaw):
-        self._send_data(self.to_dict(front, right, up, roll, pitch, yaw))
+        self.engines_driver.set_velocities(self.to_dict(front, right, up, roll, pitch, yaw))
         #print('Data sent')
         msg = "front: "+str(front)+";right: "+str(right)+";up: "+str(up)+";roll: "+str(roll)
         self.log(msg)

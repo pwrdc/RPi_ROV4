@@ -70,8 +70,7 @@ class Main():
         self.lights = None
         self.manipulator = None
         self.torpedoes = None
-        self.movements = Movements(port=ports.ENGINE_SLAVE_PORT,
-                                   depth_sensor_ref=self.depth,
+        self.movements = Movements(depth_sensor_ref=self.depth,
                                    ahrs_ref=self.ahrs,
                                    main_logger=self.logger,
                                    local_log=DEFLOG.MOVEMENTS_LOCAL_LOG)
