@@ -1,5 +1,5 @@
 from sensors.ahrs.ahrs_itf import IAHRS
-from sensors.base_sensor import BaseSensor
+from control.base import Base
 import ast
 """
 from sensors.ahrs.ahrs_separate import AHRS_Separate
@@ -8,15 +8,19 @@ from threading import Thread
 """
 
 
-class AHRS(BaseSensor,IAHRS):
+class AHRS(Base,IAHRS):
     '''
     class for accessing AHRS data using direct access to ahrs thread
     If AHRS is disconected use virtual class to returning only zeros
 
     '''
-    
+    def __init__(self, main_logger=None, local_log=False):
+        super(AHRS, self).__init__(main_logger=main_logger, local_log=local_log)
+        Pyro4.locateNS()
+        self.ahrs_server = Pyro4.Proxy("PYRONAME:ahrs_server")
+
     def getter2msg(self):
-        return str(self.get_data())
+        return str(self.get_all_data())
 
     #@Base.multithread_method
     def get_rotation(self):
@@ -79,7 +83,7 @@ class AHRS(BaseSensor,IAHRS):
         "lineA_x","lineA_y","lineA_z","angularA_x",
         "angularA_y","angularA_z"
         '''
-        return self.get_data()
+        return self.ahrs_server.get_all_data()
 
     """
     def __init__(self, main_logger=None, local_log=False, log_directory="", log_timing=0.25):

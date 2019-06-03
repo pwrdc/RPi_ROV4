@@ -14,7 +14,7 @@ class Movements(Base, IMovements):
         super(Movements, self).__init__(main_logger=main_logger, local_log=local_log)
         self.pid = PID(self.set_engine_driver_values, depth_sensor_ref.get_depth, ahrs_ref, LOOP_DELAY)
         Pyro4.locateNS()
-        self.engines_driver = Pyro4.Proxu("PYRONAME:engines_driver")
+        self.engines_driver = Pyro4.Proxy("PYRONAME:engines_driver")
     def set_lin_velocity(self, front, right, up):
         """
         Set linear velocity as 100% of engines power
