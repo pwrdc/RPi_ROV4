@@ -114,7 +114,7 @@ class Main():
         #Here you can add more feature classes
         #Remeber then to provide proper Communication class methods
 
-        self.comm = Communication(self.sensors_refs, '10.182.80.247', main_logger=self.logger)
+        self.comm = Communication(self.sensors_refs, RPI_ADDRESS, main_logger=self.logger)
         '''
         Communication class parameters are: sensors_refs, rpi_address,
         main_logger, local_logger, log_directory (last three are optional)
