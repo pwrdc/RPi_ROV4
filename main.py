@@ -46,15 +46,14 @@ class Main():
         self.hydrophones = None
         self.distance = None
         if SENSORS.AHRS:
-            self.ahrs = AHRS(port=ports.AHRS_CLIENT_PORT,
+            self.ahrs = AHRS(
                              main_logger=self.logger,
-                             local_log=DEFLOG.AHRS_LOCAL_LOG,
-                             log_timing=DEFLOG.AHRS_LOG_TIMING)
+                             local_log=DEFLOG.AHRS_LOCAL_LOG)
+                             
         if SENSORS.DEPTH:
-            self.depth = DepthSensor(port=ports.DEPTH_CLIENT_PORT,
+            self.depth = DepthSensor(
                                      main_logger=self.logger,
-                                     local_log=DEFLOG.DEPTH_LOCAL_LOG,
-                                     log_timing=DEFLOG.DEPTH_LOG_TIMING)
+                                     local_log=DEFLOG.DEPTH_LOCAL_LOG)
         if SENSORS.HYDROPHONES:
             self.hydrophones = HydrophonesPair(port=ports.HYDRO_CLIENT_PORT,
                                                main_logger=self.logger,

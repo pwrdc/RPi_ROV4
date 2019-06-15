@@ -1,6 +1,7 @@
 from sensors.ahrs.ahrs_itf import IAHRS
 from control.base import Base
 import ast
+import Pyro4
 """
 from sensors.ahrs.ahrs_separate import AHRS_Separate
 from sensors.ahrs.ahrs_virtual import AHRSvirtual

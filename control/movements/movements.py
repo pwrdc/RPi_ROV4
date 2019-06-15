@@ -1,20 +1,25 @@
-from control.base import Base
+"""
+
+Module includes Movemnets clas
+"""
 from control.movements.movements_itf import IMovements
 from control.pid.pid import PID
-import Pyro4
+from control.base import Base
 
 LOOP_DELAY = 0.05
+
+# TODO - delete or move pyro server to communication (replace or integrate with communication for xavier)
 
 class Movements(Base, IMovements):
     """
     Interfce for algorithm for accesing rpi Movement Class
     """
     def __init__(self, depth_sensor_ref, ahrs_ref, main_logger=None, local_log=False):
-        
-        super(Movements, self).__init__(main_logger=main_logger, local_log=local_log)
-        self.pid = PID(self.set_engine_driver_values, depth_sensor_ref.get_depth, ahrs_ref, LOOP_DELAY)
-        Pyro4.locateNS()
-        self.engines_driver = Pyro4.Proxy("PYRONAME:engines_driver")
+        super(Movements, self).__init__( main_logger=main_logger, local_log=local_log)
+        #self.pid = PID(self.set_engine_driver_values, depth_sensor_ref.get_depth, ahrs_ref, LOOP_DELAY)
+        self.pid = PID(self.send_values_to_engines, depth_sensor_ref.get_depth, ahrs_ref, LOOP_DELAY, local_log=True)
+        self.pid.run()
+
     def set_lin_velocity(self, front, right, up):
         """
         Set linear velocity as 100% of engines power
@@ -55,6 +60,7 @@ class Movements(Base, IMovements):
 
     def pid_hold_depth(self):
         self.pid.hold_depth()
+        self.log("movments: pid_hold_depth")
 
     def pid_turn_on(self):
         self.pid_hold_depth() #temporary
@@ -66,7 +72,13 @@ class Movements(Base, IMovements):
         self.log("movments: pid_turn_off")
 
     def set_engine_driver_values(self, front, right, up, roll, pitch, yaw):
-        self.engines_driver.set_velocities(self.to_dict(front, right, up, roll, pitch, yaw))
+        self.pid.set_velocities(front, right, up, roll, pitch, yaw)
+        #print('Data sent')
+        #msg = "front: "+str(front)+";right: "+str(right)+";up: "+str(up)+";roll: "+str(roll)
+        #self.log(msg)
+    
+    def send_values_to_engines(self, front, right, up, roll, pitch, yaw):
+        self._send_data(self.to_dict(front, right, up, roll, pitch, yaw))
         #print('Data sent')
         msg = "front: "+str(front)+";right: "+str(right)+";up: "+str(up)+";roll: "+str(roll)
         self.log(msg)
