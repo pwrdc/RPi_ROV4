@@ -16,7 +16,9 @@ class Movements(BaseController, IMovements):
     """
     def __init__(self, port, depth_sensor_ref, ahrs_ref, main_logger=None, local_log=False):
         super(Movements, self).__init__(port=port, main_logger=main_logger, local_log=local_log)
-        self.pid = PID(self.set_engine_driver_values, depth_sensor_ref.get_depth, ahrs_ref, LOOP_DELAY)
+        #self.pid = PID(self.set_engine_driver_values, depth_sensor_ref.get_depth, ahrs_ref, LOOP_DELAY)
+        self.pid = PID(self.send_values_to_engines, depth_sensor_ref.get_depth, ahrs_ref, LOOP_DELAY, local_log=True)
+        self.pid.run()
 
     def set_lin_velocity(self, front, right, up):
         """
@@ -58,6 +60,7 @@ class Movements(BaseController, IMovements):
 
     def pid_hold_depth(self):
         self.pid.hold_depth()
+        self.log("movments: pid_hold_depth")
 
     def pid_turn_on(self):
         self.pid_hold_depth() #temporary
@@ -68,10 +71,18 @@ class Movements(BaseController, IMovements):
         self.pid.turn_off_pid()
         self.log("movments: pid_turn_off")
 
+    def pid_set_params(self, kp, ki, kd):
+        self.pid.set_pid_params(kp, ki, kd)
+        self.log("movements: pid_set_params: kp: "+str(kp)+" ki: "+str(ki)+" kd: "+str(kd))
+
     def set_engine_driver_values(self, front, right, up, roll, pitch, yaw):
+        self.pid.set_velocities(front, right, up, roll, pitch, yaw)
+        #msg = "set velocities in pid front: "+str(front)+";right: "+str(right)+";up: "+str(up)+";roll: "+str(roll)
+        #self.log(msg)
+    
+    def send_values_to_engines(self, front, right, up, roll, pitch, yaw):
         self._send_data(self.to_dict(front, right, up, roll, pitch, yaw))
-        #print('Data sent')
-        msg = "front: "+str(front)+";right: "+str(right)+";up: "+str(up)+";roll: "+str(roll)
+        msg = "data sended: front: "+str(front)+";right: "+str(right)+";up: "+str(up)+";roll: "+str(roll)
         self.log(msg)
 
     def to_dict(self, front=None, right=None, up=None, roll=None, pitch=None, yaw=None):

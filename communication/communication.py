@@ -14,14 +14,14 @@ from sensors.distance.distance_itf import IDistanceSensor
 from sensors.hydrophones.hydrophones_itf import IHydrophonesPair
 
 @Pyro4.expose
-class Communication(threading.Thread, ILights, IManipulator,
-IMovements,ITorpedoes,IAHRS,IDepthSensor,IDistanceSensor,IHydrophonesPair):
+class Communication(threading.Thread, ILights, IManipulator, IMovements,
+                    ITorpedoes, IAHRS, IDepthSensor, IDistanceSensor, IHydrophonesPair):
     '''
     This class is responsible of finding Pyro4 nameserver,
     registering itself in there and providing all methods
     what classes passed from main thread offer.
     '''
-    def __init__(self,sensors_refs, rpi_address, main_logger=None, log_directory=''):
+    def __init__(self, sensors_refs, rpi_address, main_logger=None, log_directory=''):
         '''
         Starting new thread, starting Pyro4 server,
         finding Pyro4 nameserver, registering 'self' in the nameserver,
@@ -81,8 +81,8 @@ IMovements,ITorpedoes,IAHRS,IDepthSensor,IDistanceSensor,IHydrophonesPair):
             roll, pitch, yaw
         )
 
-    def set_engine_driver_values(self, front, right,
-    up, roll, pitch, yaw):
+    def set_engine_driver_values(self, front, right, up,
+                                 roll, pitch, yaw):
         self.sensors_refs['Movements'].set_engine_driver_values(
             front, right, up, roll, pitch, yaw
         )
@@ -94,6 +94,9 @@ IMovements,ITorpedoes,IAHRS,IDepthSensor,IDistanceSensor,IHydrophonesPair):
 
     def pid_hold_depth(self):
         self.sensors_refs['Movements'].pid_hold_depth()
+
+    def pid_set_params(self, kp, ki, kd):
+        self.sensors_refs['Movements'].pid_set_params(kp, ki, kd)
 
     def is_torpedo_ready(self):
         return self.sensors_refs['Torpedoes'].is_torpedo_ready()
