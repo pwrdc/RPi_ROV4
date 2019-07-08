@@ -13,6 +13,8 @@ class HydrophonesPair(IHydrophonesPair):
     '''
     def __init__(self):
         self.wav_file_count = 0
+        self.last_amp = None
+        self.amplitude_decreasing = None
 
     #@Base.multithread_method
     def get_angle(self, pinger_freq):
@@ -25,6 +27,11 @@ class HydrophonesPair(IHydrophonesPair):
         print('Signal len',len(right_fft))
         interesting_freq = len(data[0])*pinger_freq/96000
         max_value_at = self.find_max(int(interesting_freq))
+        if self.last_amp and self.last_amp > numpy.absolute(self.left_fft[max_value_at]):
+            self.amplitude_decreasing = True
+        else:
+            self.amplitude_decreasing = False
+        self.last_amp = numpy.absolute(self.left_fft[max_value_at])
         print('Max value at ',max_value_at/2,'Hz')
         phase_delta = numpy.angle(right_fft[max_value_at], deg = False) - numpy.angle(self.left_fft[max_value_at],deg = False)
         if phase_delta > numpy.pi:
@@ -52,7 +59,7 @@ class HydrophonesPair(IHydrophonesPair):
         plik.close()
         #END OF TEST
 
-        return angle_to_pinger
+        return angle_to_pinger, self.amplitude_decreasing
         
 
     def find_max(self,region_center):
