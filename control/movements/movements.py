@@ -78,6 +78,12 @@ class Movements(BaseController, IMovements):
         self.pid.set_pid_params(kp, ki, kd)
         self.log("movements: pid_set_params: kp: "+str(kp)+" ki: "+str(ki)+" kd: "+str(kd))
 
+    def pid_set_depth(self, depth):
+        """
+        :param: depth - float - target depth for PID
+        """
+        self.pid.set_depth(depth)
+
     def set_engine_driver_values(self, front, right, up, roll, pitch, yaw):
         self.pid.set_velocities(front, right, up, roll, pitch, yaw)
         #msg = "set velocities in pid front: "+str(front)+";right: "+str(right)+";up: "+str(up)+";roll: "+str(roll)

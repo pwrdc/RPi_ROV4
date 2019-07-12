@@ -6,6 +6,7 @@ from definitions import PID as PID_DEF
 
 UP_MARGIN = 0.04
 
+
 class PID(Base, IPID):
     def __init__(self,
                  set_engine_driver_fun,
@@ -33,11 +34,11 @@ class PID(Base, IPID):
 
         self.set_point = 0.0
 
-        self.front=0.0
-        self.right=0.0
-        self.roll=0.0
-        self.pitch=0.0
-        self.yaw=0.0
+        self.front = 0.0
+        self.right = 0.0
+        self.roll = 0.0
+        self.pitch = 0.0
+        self.yaw = 0.0
 
         self.set_engine_driver_fun = set_engine_driver_fun
         self.get_depth_fun = get_depth_fun
@@ -118,11 +119,18 @@ class PID(Base, IPID):
             self.close_bool = True
 
     def hold_depth(self):
+        """
+        set current depth of vehicle as target for PID
+        """
         self.set_point = self.get_depth()
         self.log("hold depth: "+ str(self.set_point))
 
     def set_depth(self, depth):
+        """
+        :param: depth - float - target depth for PID
+        """
         self.set_point = depth
+        self.clear()
 
     def pid_loop(self):
         num = 0
