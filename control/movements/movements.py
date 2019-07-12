@@ -16,8 +16,11 @@ class Movements(BaseController, IMovements):
     """
     def __init__(self, port, depth_sensor_ref, ahrs_ref, main_logger=None, local_log=False):
         super(Movements, self).__init__(port=port, main_logger=main_logger, local_log=local_log)
-        #self.pid = PID(self.set_engine_driver_values, depth_sensor_ref.get_depth, ahrs_ref, LOOP_DELAY)
-        self.pid = PID(self.send_values_to_engines, depth_sensor_ref.get_depth, ahrs_ref, LOOP_DELAY, local_log=True)
+        self.pid = PID(self.send_values_to_engines,
+                       depth_sensor_ref.get_depth,
+                       ahrs_ref,
+                       LOOP_DELAY,
+                       local_log=True)
         self.pid.run()
 
     def set_lin_velocity(self, front, right, up):

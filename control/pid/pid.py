@@ -2,6 +2,7 @@ import time
 from threading import Thread, Lock
 from control.base import Base
 from control.pid.pid_itf import IPID
+from definitions import PID as PID_DEF
 
 UP_MARGIN = 0.04
 
@@ -15,9 +16,9 @@ class PID(Base, IPID):
                  local_log=False,
                  log_directory="",
                  log_timing=0.5,
-                 kp=0.6,
-                 ki=0.06,
-                 kd=5.0):
+                 kp=PID_DEF.KP,
+                 ki=PID_DEF.KI,
+                 kd=PID_DEF.KD):
         # moze parametry z pliku?
         '''
         Set linear velocity as 100% of engines power

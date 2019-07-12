@@ -1,4 +1,12 @@
-RPI_ADDRESS = '192.168.0.100'
+"""
+File contains definitions of const values in code
+"""
+MODE = "ROV4"  # 'ROV3' or 'ROV4' or 'SIMULATION'
+
+if MODE == 'SIMULATION':
+    RPI_ADDRESS = '127.0.0.1'  # local address
+else:
+    RPI_ADDRESS = '192.168.0.101'  # RPi address
 
 class DEFLOG:
     DEPTH_LOCAL_LOG = True
@@ -27,3 +35,15 @@ class CONTROL:
     LIGHTS = False
     MANIPULATOR = False
     TORPEDOES = False
+
+class PID:
+    if MODE == 'ROV4':
+        # values for ROV4:
+        KP = 1.38
+        KI = 0.0192
+        KD = 0.84
+    elif MODE == 'ROV3':
+        # values for ROV3:
+        KP = 3.69
+        KI = 0.0
+        KD = 0.84
