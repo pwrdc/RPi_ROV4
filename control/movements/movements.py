@@ -54,12 +54,30 @@ class Movements(BaseController, IMovements):
     def rotate_angle(self, roll, pitch, yaw):
         """
         Make precise angular movement
-        @param: roll float in range [-360, 360], case negative - reverse direction
-        @param: pitch float in range [-360, 360], case negative - reverse direction
-        @param: yaw flaot in range [-360, 360], case negative - reverse direction
+        @param: roll float in range [-180, 180], case negative - reverse direction
+        @param: pitch float in range [-180, 180], case negative - reverse direction
+        @param: yaw float in range [-180, 180], case negative - reverse direction
 
         """
-        pass
+        allowed_error = 1 # in degrees
+        break_factor = 0.1 # greater value => faster speed down
+
+        direction = copysign(1, yaw)
+        dest_yaw = self.pid.ahrs.get_rotation()["yaw"] + yaw
+        break_angle = break_factor * yaw
+        if abs(dest_yaw) > 180:
+            dest_yaw -= copysign(360, dest_yaw)
+        stop = False
+        breaking = False
+        while ~stop:
+            error = dest_yaw - self.pid.ahrs.get_rotation()["yaw"]
+            if abs(error) > allowed_error:
+                if ~breaking & abs(error) <= break_angle:
+                    direction *= -1
+                    breaking = True
+                self.set_engine_driver_values(0, 0, 0, 0, 0, direction)
+            else:
+                stop = True
 
     def pid_hold_depth(self):
         self.pid.hold_depth()
