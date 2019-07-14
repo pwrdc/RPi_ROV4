@@ -102,7 +102,7 @@ class Communication(threading.Thread, ILights, IManipulator, IMovements,
         """
         :param: depth - float - target depth for PID
         """
-        self.sensors_refs['Movements'].set_depth(depth)
+        self.sensors_refs['Movements'].pid_set_depth(depth)
 
     def is_torpedo_ready(self):
         return self.sensors_refs['Torpedoes'].is_torpedo_ready()

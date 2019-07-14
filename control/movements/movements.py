@@ -30,7 +30,7 @@ class Movements(BaseController, IMovements):
         @param: right int in range [-100, 100], case negative value move down
         @param: up int in range [-100,100], case negative value move down
         """
-        self.pid.set_velocities(front, right, up)
+        self.pid.set_velocities(front/100, right/100, up/100)
 
     def set_ang_velocity(self, roll, pitch, yaw):
         """
@@ -39,7 +39,7 @@ class Movements(BaseController, IMovements):
         @param: pitch int in range [-100, 100], case negative - reverse direction
         @param: yaw int in range [-100,100], case negative - reverse direction
         """
-        self.pid.set_velocities(yaw=yaw)
+        self.pid.set_velocities(yaw=yaw/100)
 
     def move_distance(self, front, right, up):
         """
@@ -88,7 +88,7 @@ class Movements(BaseController, IMovements):
         self.pid.set_velocities(front, right, up, roll, pitch, yaw)
         #msg = "set velocities in pid front: "+str(front)+";right: "+str(right)+";up: "+str(up)+";roll: "+str(roll)
         #self.log(msg)
-    
+
     def send_values_to_engines(self, front, right, up, roll, pitch, yaw):
         self._send_data(self.to_dict(front, right, up, roll, pitch, yaw))
         msg = "data sended: front: "+str(front)+";right: "+str(right)+";up: "+str(up)+";roll: "+str(roll)
