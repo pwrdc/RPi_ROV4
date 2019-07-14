@@ -2,6 +2,7 @@
 
 Module includes Movemnets clas
 """
+from math import copysign
 from control.movements.movements_itf import IMovements
 from control.pid.pid import PID
 from control.base_controller import BaseController
@@ -69,10 +70,10 @@ class Movements(BaseController, IMovements):
             dest_yaw -= copysign(360, dest_yaw)
         stop = False
         breaking = False
-        while ~stop:
+        while not stop:
             error = dest_yaw - self.pid.ahrs.get_rotation()["yaw"]
             if abs(error) > allowed_error:
-                if ~breaking & abs(error) <= break_angle:
+                if not breaking and (abs(error) <= break_angle):
                     direction *= -1
                     breaking = True
                 self.set_engine_driver_values(0, 0, 0, 0, 0, direction)
