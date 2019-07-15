@@ -2,7 +2,7 @@ import time
 from threading import Thread, Lock
 from control.base import Base
 from control.pid.pid_itf import IPID
-from definitions import PID as PID_DEF
+from definitions import PID_DEPTH as PID_DEF
 
 UP_MARGIN = 0.04
 
@@ -107,11 +107,11 @@ class PIDdepth(Base, IPID):
         self.log("Output update; error: "+ str(error)+ "  output: " +str(self.output))
 
     def run(self):
-        self.log("PID: running")
+        self.log("PIDdepth: running")
         super().run()
         thread = Thread(target=self.pid_loop)
         thread.start()
-        self.log("PID: finish running")
+        self.log("PIDdepth: finish running")
 
     def close(self):
         super().close()
@@ -154,14 +154,14 @@ class PIDdepth(Base, IPID):
 
     def turn_on_pid(self):
         with self.pid_active_lock:
-            self.log("PID activated")
+            self.log("PIDdepth activated")
             self.pid_active = True
             self.clear()
-            self.log("PID activated")
+            self.log("PIDdepth activated")
 
     def turn_off_pid(self):
         with self.pid_active_lock:
-            self.log("PID deactivated")
+            self.log("PIDdepth deactivated")
             self.pid_active = False
 
     def set_pid_params(self, kp, ki, kd):

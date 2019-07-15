@@ -4,6 +4,7 @@ Module includes Movemnets clas
 """
 from control.movements.movements_itf import IMovements
 from control.pid.pid_depth import PIDdepth
+from control.pid.pid_yaw import PIDyaw
 from control.base_controller import BaseController
 
 LOOP_DELAY = 0.05
@@ -15,13 +16,25 @@ class Movements(BaseController, IMovements):
     Interfce for algorithm for accesing rpi Movement Class
     """
     def __init__(self, port, depth_sensor_ref, ahrs_ref, main_logger=None, local_log=False):
+        """
+        Construction of pid is like cascade:
+        the pid_depth call the set_velocities method of the pid_yaw, so values doesn't get lost
+        """
         super(Movements, self).__init__(port=port, main_logger=main_logger, local_log=local_log)
-        self.pid_depth = PIDdepth(self.send_values_to_engines,
-                       depth_sensor_ref.get_depth,
-                       ahrs_ref,
-                       LOOP_DELAY,
-                       local_log=True)
+        self.pid_yaw = PIDyaw(self.send_values_to_engines,
+                              ahrs_ref.get_yaw,
+                              ahrs_ref,
+                              LOOP_DELAY,
+                              local_log=True)
+        # pid depth - master 
+        self.pid_depth = PIDdepth(self.pid_yaw.set_velocities,
+                                  depth_sensor_ref.get_depth,
+                                  ahrs_ref,
+                                  LOOP_DELAY,
+                                  local_log=True)
+
         self.pid_depth.run()
+        self.pid_yaw.run()
 
     def set_lin_velocity(self, front, right, up):
         """
@@ -65,16 +78,16 @@ class Movements(BaseController, IMovements):
         self.pid_depth.hold_depth()
         self.log("movments: pid_hold_depth")
 
-    def pid_turn_on(self):
-        self.pid_depth_hold_depth() #temporary
+    def pid_depth_turn_on(self):
+        self.pid_hold_depth() #temporary
         self.pid_depth.turn_on_pid()
         self.log("movments: pid_turn_on")
 
-    def pid_turn_off(self):
+    def pid_depth_turn_off(self):
         self.pid_depth.turn_off_pid()
         self.log("movments: pid_turn_off")
 
-    def pid_set_params(self, kp, ki, kd):
+    def pid_depth_set_params(self, kp, ki, kd):
         self.pid_depth.set_pid_params(kp, ki, kd)
         self.log("movements: pid_set_params: kp: "+str(kp)+" ki: "+str(ki)+" kd: "+str(kd))
 
@@ -83,6 +96,29 @@ class Movements(BaseController, IMovements):
         :param: depth - float - target depth for PID
         """
         self.pid_depth.set_depth(depth)
+
+    def pid_hold_yaw(self):
+        self.pid_yaw.hold_yaw()
+        self.log("movments: pid_hold_depth")
+
+    def pid_yaw_turn_on(self):
+        self.pid_hold_yaw() #temporary
+        self.pid_yaw.turn_on_pid()
+        self.log("movments: pid_turn_on")
+
+    def pid_yaw_turn_off(self):
+        self.pid_yaw.turn_off_pid()
+        self.log("movments: pid_turn_off")
+
+    def pid_yaw_set_params(self, kp, ki, kd):
+        self.pid_yaw.set_pid_params(kp, ki, kd)
+        self.log("movements: pid_set_params: kp: "+str(kp)+" ki: "+str(ki)+" kd: "+str(kd))
+
+    def pid_set_yaw(self, yaw):
+        """
+        :param: angle - float - target depth for PID
+        """
+        self.pid_yaw.set_yaw(yaw)
 
     def set_engine_driver_values(self, front, right, up, roll, pitch, yaw):
         self.pid_depth.set_velocities(front, right, up, roll, pitch, yaw)

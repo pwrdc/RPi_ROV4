@@ -2,7 +2,7 @@ import time
 from threading import Thread, Lock
 from control.base import Base
 from control.pid.pid_itf import IPID
-from definitions import PID as PID_DEF
+from definitions import PID_YAW as PID_DEF
 
 UP_MARGIN = 0.04
 
@@ -16,17 +16,18 @@ class PIDyaw(Base, IPID):
                  main_logger=None,
                  local_log=False,
                  log_directory="",
-                 log_timing=0.5,
+                 pid_loop_run_allowed=False,
                  kp=PID_DEF.KP,
                  ki=PID_DEF.KI,
                  kd=PID_DEF.KD):
         '''
         Set linear velocity as 100% of engines power
-        @param set_engine_driver_fun: reference to _set_engine_driver_values
+        :param set_engine_driver_fun: reference to _set_engine_driver_values
                 in Movements object (see movments_itf.py)
-        @param get_yaw_fun: reference to method returning yaw
-        @param ahrs: reference to AHRS object
+        :param get_yaw_fun: reference to method returning yaw
+        :param ahrs: reference to AHRS object
                 (see AHRS in sensors/ahrs/ahrs_itf.py)
+        :param pid_loop_active: boolean value - if true pid loop activates in run()
         '''
         super(PIDyaw, self).__init__(main_logger, local_log, log_directory)
 
@@ -46,6 +47,8 @@ class PIDyaw(Base, IPID):
         self.pid_active_lock = Lock()
         self.pid_active = False
         self.get_yaw_fun_lock = Lock()
+
+        self.pid_loop_run_allowed = pid_loop_run_allowed
 
         self.close_bool = False
 
@@ -107,9 +110,10 @@ class PIDyaw(Base, IPID):
     def run(self):
         self.log("PID: running")
         super().run()
-        thread = Thread(target=self.pid_loop)
-        thread.start()
-        self.log("PID: finish running")
+        if self.pid_loop_run_allowed:
+            thread = Thread(target=self.pid_loop)
+            thread.start()
+            self.log("PID: finish running")
 
     def close(self):
         super().close()
