@@ -7,7 +7,7 @@ from definitions import PID as PID_DEF
 UP_MARGIN = 0.04
 
 
-class PID(Base, IPID):
+class PIDdepth(Base, IPID):
     def __init__(self,
                  set_engine_driver_fun,
                  get_depth_fun,
@@ -30,7 +30,7 @@ class PID(Base, IPID):
         @param ahrs: reference to AHRS object
                 (see AHRS in sensors/ahrs/ahrs_itf.py)
         '''
-        super(PID, self).__init__(main_logger, local_log, log_directory)
+        super(PIDdepth, self).__init__(main_logger, local_log, log_directory)
 
         self.set_point = 0.0
 
