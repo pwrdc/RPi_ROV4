@@ -38,7 +38,7 @@ class Main():
         '''
         Creates and stores references of all slave objects.
         '''
-        self.logger = Logger(filename='main', title="Main")
+        self.logger = Logger(filename='main', title="Main", directory=DEFLOG.LOG_DIRECTORY)
 
         #Sensors initialization
         self.ahrs = None
@@ -49,22 +49,26 @@ class Main():
             self.ahrs = AHRS(port=ports.AHRS_CLIENT_PORT,
                              main_logger=self.logger,
                              local_log=DEFLOG.AHRS_LOCAL_LOG,
-                             log_timing=DEFLOG.AHRS_LOG_TIMING)
+                             log_timing=DEFLOG.AHRS_LOG_TIMING,
+                             log_directory=DEFLOG.LOG_DIRECTORY)
         if SENSORS.DEPTH:
             self.depth = DepthSensor(port=ports.DEPTH_CLIENT_PORT,
                                      main_logger=self.logger,
                                      local_log=DEFLOG.DEPTH_LOCAL_LOG,
-                                     log_timing=DEFLOG.DEPTH_LOG_TIMING)
+                                     log_timing=DEFLOG.DEPTH_LOG_TIMING,
+                                     log_directory=DEFLOG.LOG_DIRECTORY)
         if SENSORS.HYDROPHONES:
             self.hydrophones = HydrophonesPair(port=ports.HYDRO_CLIENT_PORT,
                                                main_logger=self.logger,
                                                local_log=DEFLOG.HYDROPHONES_LOCAL_LOG,
-                                               log_timing=DEFLOG.HYDROPHONES_LOG_TIMING)
+                                               log_timing=DEFLOG.HYDROPHONES_LOG_TIMING,
+                                               log_directory=DEFLOG.LOG_DIRECTORY)
         if SENSORS.DISTANCE:
             self.distance = DistanceSensor(port=ports.DISTANCE_CLIENT_PORT,
                                            main_logger=self.logger,
                                            local_log=DEFLOG.DISTANCE_LOCAL_LOG,
-                                           log_timing=DEFLOG.HYDROPHONES_LOG_TIMING)
+                                           log_timing=DEFLOG.HYDROPHONES_LOG_TIMING,
+                                           log_directory=DEFLOG.LOG_DIRECTORY)
 
         #Controls initialization
         self.lights = None
@@ -74,7 +78,8 @@ class Main():
                                    depth_sensor_ref=self.depth,
                                    ahrs_ref=self.ahrs,
                                    main_logger=self.logger,
-                                   local_log=DEFLOG.MOVEMENTS_LOCAL_LOG)
+                                   local_log=DEFLOG.MOVEMENTS_LOCAL_LOG,
+                                   log_directory=DEFLOG.LOG_DIRECTORY)
         if CONTROL.LIGHTS:
             self.lights = Lights(port=ports.LIGHTS_CLIENT_PORT, main_logger=self.logger)
         if CONTROL.MANIPULATOR:

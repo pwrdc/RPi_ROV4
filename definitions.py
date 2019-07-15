@@ -9,6 +9,8 @@ else:
     RPI_ADDRESS = '192.168.0.101'  # RPi address
 
 class DEFLOG:
+    LOG_DIRECTORY = "logs/"
+
     DEPTH_LOCAL_LOG = True
     DEPTH_LOG_TIMING = 0.1
 
