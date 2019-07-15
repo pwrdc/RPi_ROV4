@@ -73,7 +73,7 @@ class HydrophonesPair(IHydrophonesPair):
     
     def from_phase_to_angle(self, phase_delta, freq):
         if freq == 15000:
-            angle = 11.068*phase_delta**3 + 3.8552*phase_delta**2 -101.34*phase_delta + 16.389
+            angle = -0.7716*phase_delta**3 - 3.0424*phase_delta**2 -28.579*phase_delta + 11.53 # y = -0.7716x3 - 3.0424x2 - 28.579x + 11.534
         elif freq == 20000:
             angle = -9.7242*phase_delta**3 - 0.5636*phase_delta**2 -49.982*phase_delta+19.794
         elif freq == 25000:
