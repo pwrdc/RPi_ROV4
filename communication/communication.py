@@ -54,7 +54,7 @@ class Communication(threading.Thread, ILights, IManipulator, IMovements,
         main_logger.log('Communication server set correctly')
         daemon.requestLoop()
         #Starting Pyro4 server loop
-        
+
     def power_lights(self, power_supplied):
         self.sensors_refs['Lights'].power_lights(power_supplied)
 
@@ -86,17 +86,19 @@ class Communication(threading.Thread, ILights, IManipulator, IMovements,
         self.sensors_refs['Movements'].set_engine_driver_values(
             front, right, up, roll, pitch, yaw
         )
-    def pid_turn_on(self):
-        self.sensors_refs['Movements'].pid_turn_on()
-    
-    def pid_turn_off(self):
-        self.sensors_refs['Movements'].pid_turn_off()
+
+    # Movements pid - depth
+    def pid_depth_turn_on(self):
+        self.sensors_refs['Movements'].pid_depth_turn_on()
+
+    def pid_depth_turn_off(self):
+        self.sensors_refs['Movements'].pid_depth_turn_off()
 
     def pid_hold_depth(self):
         self.sensors_refs['Movements'].pid_hold_depth()
 
-    def pid_set_params(self, kp, ki, kd):
-        self.sensors_refs['Movements'].pid_set_params(kp, ki, kd)
+    def pid_depth_set_params(self, kp, ki, kd):
+        self.sensors_refs['Movements'].pid_depth_set_params(kp, ki, kd)
 
     def pid_set_depth(self, depth):
         """
@@ -104,6 +106,26 @@ class Communication(threading.Thread, ILights, IManipulator, IMovements,
         """
         self.sensors_refs['Movements'].pid_set_depth(depth)
 
+    # Movements pid - yaw
+    def pid_yaw_turn_on(self):
+        self.sensors_refs['Movements'].pid_yaw_turn_on()
+
+    def pid_yaw_turn_off(self):
+        self.sensors_refs['Movements'].pid_yaw_turn_off()
+
+    def pid_hold_yaw(self):
+        self.sensors_refs['Movements'].pid_hold_yaw()
+
+    def pid_yaw_set_params(self, kp, ki, kd):
+        self.sensors_refs['Movements'].pid_yaw_set_params(kp, ki, kd)
+
+    def pid_set_yaw(self, yaw):
+        """
+        :param: yaw - float in range [-180,180] - target yaw for PID
+        """
+        self.sensors_refs['Movements'].set_yaw(yaw)
+
+    # Torpedoes
     def is_torpedo_ready(self):
         return self.sensors_refs['Torpedoes'].is_torpedo_ready()
 

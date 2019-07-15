@@ -36,7 +36,7 @@ class CONTROL:
     MANIPULATOR = False
     TORPEDOES = False
 
-class PID:
+class PID_DEPTH:
     if MODE == 'ROV4':
         # values for ROV4:
         KP = 1.38
@@ -47,3 +47,8 @@ class PID:
         KP = 3.69
         KI = 0.0
         KD = 0.84
+
+class PID_YAW:
+    KP = 0.0
+    KI = 0.0
+    KD = 0.0
