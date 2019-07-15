@@ -2,6 +2,7 @@
 
 Module includes Movemnets clas
 """
+import time
 from math import copysign
 from control.movements.movements_itf import IMovements
 from control.pid.pid_depth import PIDdepth
@@ -74,8 +75,8 @@ class Movements(BaseController, IMovements):
         @param: yaw float in range [-180, 180], case negative - reverse direction
 
         """
-        allowed_error = 1 # in degrees
-        break_factor = 0.1 # greater value => faster speed down
+        allowed_error = 5 # in degrees
+        break_factor = 0.2 # greater value => faster speed down
 
         direction = copysign(1, yaw)
         dest_yaw = self.ahrs.get_rotation()["yaw"] + yaw
@@ -86,11 +87,14 @@ class Movements(BaseController, IMovements):
         breaking = False
         while not stop:
             error = dest_yaw - self.ahrs.get_rotation()["yaw"]
+            self.log("rotation: error "+str(error))
             if abs(error) > allowed_error:
                 if not breaking and (abs(error) <= break_angle):
                     direction *= -1
                     breaking = True
                 self.set_engine_driver_values(0, 0, 0, 0, 0, direction)
+                self.log("val of rotation: "+str(direction))
+                time.sleep(0.001)
             else:
                 stop = True
 
@@ -147,7 +151,7 @@ class Movements(BaseController, IMovements):
 
     def send_values_to_engines(self, front, right, up, roll, pitch, yaw):
         self._send_data(self.to_dict(front, right, up, roll, pitch, yaw))
-        msg = "data sended: front: "+str(front)+";right: "+str(right)+";up: "+str(up)+";roll: "+str(roll)
+        msg = "data sended: front: "+str(front)+";right: "+str(right)+";up: "+str(up)+";yaw: "+str(yaw)
         self.log(msg)
 
     def to_dict(self, front=None, right=None, up=None, roll=None, pitch=None, yaw=None):
