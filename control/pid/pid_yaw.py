@@ -60,6 +60,8 @@ class PIDyaw(Base, IPID):
 
         self.clear()
 
+        self.pid_error = 0.0# for GUI
+
     def get_yaw(self):
         with self.get_yaw_fun_lock:
             return self.get_yaw_fun()
@@ -103,17 +105,18 @@ class PIDyaw(Base, IPID):
             self.last_time = self.current_time
             self.last_error = error
 
-            self.output = (self.PTerm + (self.Ki * self.ITerm) + (
+            self.output = -1.0* (self.PTerm + (self.Ki * self.ITerm) + (
                 self.Kd * self.DTerm))
         self.log("Output update; error: "+ str(error)+ "  output: " +str(self.output))
+        self.pid_error = error# for GUI
 
     def run(self):
         self.log("PID: running")
         super().run()
-        if self.pid_loop_run_allowed:
-            thread = Thread(target=self.pid_loop)
-            thread.start()
-            self.log("PID: finish running")
+        #if self.pid_loop_run_allowed:
+        thread = Thread(target=self.pid_loop)
+        thread.start()
+        self.log("PID: finish running")
 
     def close(self):
         super().close()
@@ -131,6 +134,7 @@ class PIDyaw(Base, IPID):
         """
         :param: yaw - float - target yaw for PID
         """
+        self.log("set_yaw: "+str(yaw))
         self.set_point = yaw
         self.clear()
 
@@ -145,14 +149,14 @@ class PIDyaw(Base, IPID):
                 with self.pid_loop_lock:
                     if self.close_bool:
                         break
-                with self.pid_active_lock:
-                    if self.pid_active:
-                        num += 1
-                        if num == 1:
-                            num = 0
-                            self.log("yaw pid kp= "+str(self.Kp)+" ki= "+str(self.Ki)+" kd= "+str(self.Kd)+str((self.front, self.right,
-                                                                           self.up, self.roll, self.pitch, self.val_to_range(self.output))))
-                        self.set_engine_driver_fun(self.front, self.right, self.up, self.roll, self.pitch, self.val_to_range(self.output))
+                #with self.pid_active_lock:
+                #    if self.pid_active:
+                #        num += 1
+                #        if num == 1:
+                #            num = 0
+                #           self.log("yaw pid kp= "+str(self.Kp)+" ki= "+str(self.Ki)+" kd= "+str(self.Kd)+str((self.front, self.right,
+                #                                                          self.up, self.roll, self.pitch, self.val_to_range(self.output))))
+                #        self.set_engine_driver_fun(self.front, self.right, self.up, self.roll, self.pitch, self.val_to_range(self.output))
 
     def turn_on_pid(self):
         with self.pid_active_lock:
@@ -188,8 +192,18 @@ class PIDyaw(Base, IPID):
         self.up=up
 
         with self.pid_active_lock:
-            if (up>UP_MARGIN and up < -UP_MARGIN) or not self.pid_active:
+            if (yaw>UP_MARGIN and yaw < -UP_MARGIN) or not self.pid_active:
                 self.set_engine_driver_fun(front, right, up, roll, pitch, yaw)
                 #self.log("Send normal values")
             else:
                 self.set_engine_driver_fun(front, right, up, roll, pitch, self.val_to_range(self.output))
+
+    # for GUI
+    def get_error(self):
+        return self.pid_error
+
+    def get_output(self):
+        return self.output
+    
+    def get_set_point(self):
+        return self.set_point

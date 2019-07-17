@@ -106,6 +106,17 @@ class Communication(threading.Thread, ILights, IManipulator, IMovements,
         """
         self.sensors_refs['Movements'].pid_set_depth(depth)
 
+    # for GUI
+    def get_pid_depth_error(self):
+        return self.sensors_refs['Movements'].pid_depth_get_error()
+
+    def get_pid_depth_output(self):
+        return self.sensors_refs['Movements'].pid_depth_get_output()
+
+    def get_depth_set_point(self):
+        return self.sensors_refs['Movements'].get_depth_set_point()
+    # end for gui
+
     # Movements pid - yaw
     def pid_yaw_turn_on(self):
         self.sensors_refs['Movements'].pid_yaw_turn_on()
@@ -123,7 +134,18 @@ class Communication(threading.Thread, ILights, IManipulator, IMovements,
         """
         :param: yaw - float in range [-180,180] - target yaw for PID
         """
-        self.sensors_refs['Movements'].set_yaw(yaw)
+        self.sensors_refs['Movements'].pid_set_yaw(yaw)
+
+    # for GUI
+    def get_pid_yaw_error(self):
+        return self.sensors_refs['Movements'].pid_yaw_get_error()
+
+    def get_pid_yaw_output(self):
+        return self.sensors_refs['Movements'].pid_yaw_get_output()
+
+    def get_yaw_set_point(self):
+        return self.sensors_refs['Movements'].get_yaw_set_point()
+    # end for GUI
 
     # Torpedoes
     def is_torpedo_ready(self):
@@ -137,6 +159,9 @@ class Communication(threading.Thread, ILights, IManipulator, IMovements,
 
     def get_rotation(self):
         return self.sensors_refs['AHRS'].get_rotation()
+    
+    def get_yaw(self):
+        return self.sensors_refs['AHRS'].get_yaw()
 
     def get_linear_accelerations(self):
         return self.sensors_refs['AHRS'].get_linear_accelerations()
