@@ -58,6 +58,7 @@ class PIDdepth(Base, IPID):
         self.Kd = kd
 
         self.clear()
+        self.pid_error = 0.0# for GUI
 
     def get_depth(self):
         with self.get_depth_fun_lock:
@@ -102,9 +103,10 @@ class PIDdepth(Base, IPID):
             self.last_time = self.current_time
             self.last_error = error
 
-            self.output = (self.PTerm + (self.Ki * self.ITerm) + (
+            self.output = -1.0*(self.PTerm + (self.Ki * self.ITerm) + (
                 self.Kd * self.DTerm))
         self.log("Output update; error: "+ str(error)+ "  output: " +str(self.output))
+        self.pid_error = error# for GUI
 
     def run(self):
         self.log("PIDdepth: running")
@@ -192,3 +194,13 @@ class PIDdepth(Base, IPID):
             else:
                 #self.log("Pid is active - external: "+str((front, right, self.val_to_range(self.output), roll, pitch, yaw)))
                 self.set_engine_driver_fun(front, right, self.val_to_range(self.output), roll, pitch, yaw)
+
+    # for GUI
+    def get_error(self):
+        return self.pid_error
+
+    def get_output(self):
+        return self.output
+
+    def get_set_point(self):
+        return self.set_point

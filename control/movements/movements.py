@@ -17,23 +17,29 @@ class Movements(BaseController, IMovements):
     """
     Interfce for algorithm for accesing rpi Movement Class
     """
-    def __init__(self, port, depth_sensor_ref, ahrs_ref, main_logger=None, local_log=False):
+    def __init__(self, port, depth_sensor_ref, ahrs_ref, main_logger=None,
+                 local_log=False, log_directory=""):
         """
         Construction of pid is like cascade:
         the pid_depth call the set_velocities method of the pid_yaw, so values doesn't get lost
         """
-        super(Movements, self).__init__(port=port, main_logger=main_logger, local_log=local_log)
+        super(Movements, self).__init__(port=port,
+                                        main_logger=main_logger,
+                                        local_log=local_log,
+                                        log_directory=log_directory)
         self.pid_yaw = PIDyaw(self.send_values_to_engines,
                               ahrs_ref.get_yaw,
                               ahrs_ref,
                               LOOP_DELAY,
-                              local_log=True)
+                              local_log=True,
+                              log_directory=log_directory)
         # pid depth - master 
         self.pid_depth = PIDdepth(self.pid_yaw.set_velocities,
                                   depth_sensor_ref.get_depth,
                                   ahrs_ref,
                                   LOOP_DELAY,
-                                  local_log=True)
+                                  local_log=True,
+                                  log_directory=log_directory)
 
         self.pid_depth.run()
         self.pid_yaw.run()
@@ -143,6 +149,26 @@ class Movements(BaseController, IMovements):
         :param: angle - float - target depth for PID
         """
         self.pid_yaw.set_yaw(yaw)
+
+    # for GUI
+    def pid_depth_get_error(self):
+        return self.pid_depth.get_error()
+
+    def pid_depth_get_output(self):
+        return self.pid_depth.get_output()
+    
+    def pid_yaw_get_error(self):
+        return self.pid_yaw.get_error()
+
+    def pid_yaw_get_output(self):
+        return self.pid_yaw.get_output()
+
+    def get_depth_set_point(self):
+        return self.pid_depth.get_set_point()
+
+    def get_yaw_set_point(self):
+        return self.pid_yaw.get_set_point()
+    # end for GUI
 
     def set_engine_driver_values(self, front, right, up, roll, pitch, yaw):
         self.pid_depth.set_velocities(front, right, up, roll, pitch, yaw)

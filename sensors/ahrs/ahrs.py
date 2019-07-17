@@ -21,33 +21,34 @@ class AHRS(BaseSensor,IAHRS):
     If AHRS is disconected use virtual class to returning only zeros
 
     '''
-    def __init__(self, port, timeout=200, main_logger=None,
-                 local_log=False, log_directory='logs/', log_timing=0.5):
+    def __init__(self, port, timeout=200, main_logger=None, local_log=False,
+                 log_directory='logs/', log_timing=0.5, mode="ROV4"):
         super(AHRS, self).__init__(port=port,
                                    timeout=timeout,
                                    main_logger=main_logger,
                                    local_log=local_log,
                                    log_directory=log_directory,
-                                   log_timing=log_timing,
-                                   mode="ROV4")
+                                   log_timing=log_timing)
         self.mode = mode
-        if mode != 'RPI':
+        if mode != 'SIMULATION':
             self.ahrs = AHRS_Separate()
         self.thread = threading.Thread(target=self.ahrs.run)
         self.thread.start()
 
     def getter2msg(self):
-        return str(self.get_data())
+        return str(self.get_yaw())
 
     def get_yaw(self):
         """
-        :return: yaw - float walue in range [-180,180]
+        :return: yaw - float walue,
+        value takes into account multiple rotations
+        possible values in whole range of real numbers
         """
         if self.mode == 'SIMULATION':
-            return self.ahrs.yaw
-        else:
             received = self.get_data()
             return received['yaw']
+        else:
+            return self.ahrs.yaw + self.ahrs.yaw_correction
 
     #@Base.multithread_method
     def get_rotation(self):
@@ -99,7 +100,7 @@ class AHRS(BaseSensor,IAHRS):
         :return: dictionary with keys "angularA_x"
         "angularA_y", angularA_z"
         '''
-        if self.mode = 'SIMULATION':
+        if self.mode == 'SIMULATION':
             received = self.get_data()
             output = {}
             print(received)
@@ -124,7 +125,7 @@ class AHRS(BaseSensor,IAHRS):
         "lineA_x","lineA_y","lineA_z","angularA_x",
         "angularA_y","angularA_z"
         '''
-        if self.mode = 'SIMULATION':
+        if self.mode == 'SIMULATION':
             return self.get_data()
         else:
             rot = self.get_rotation()
@@ -167,6 +168,9 @@ class AHRS_Separate():
         self.logger = Logger(filename='ahrs_test',directory='',logtype='info',timestamp='%Y-%m-%d | %H:%M:%S.%f',logformat='[{timestamp}] {logtype}:    {message}',prefix='',postfix='',title='AHRS logger',logexists='append',console=False) 
         self.close_order = False
 
+        self.yaw_correction = 0.0
+        self.previous_yaw = 0.0
+
     def get_message(self):
         MID = 0
         data = 0
@@ -201,6 +205,8 @@ class AHRS_Separate():
                         break
 
         self._interpret_message(MID, data)
+
+        self.should_fix()
 
     def _interpret_euler(self, data: BytesQueue):
         length = data.pop()
@@ -300,6 +306,17 @@ class AHRS_Separate():
         :return: True if you can use AHRS or False if you can't
         '''
         return os.path.exists(IMU_PORT)
+
+    def should_fix(self):
+        LIMIT = 175.0
+        if self.yaw > (LIMIT+self.yaw_correction) and self.previous_yaw < (-LIMIT+self.yaw_correction):
+            self.yaw_correction -= 360.0
+        elif self.yaw < (-LIMIT+self.yaw_correction) and self.previous_yaw > (LIMIT+self.yaw_correction):
+            self.yaw_correction += 360.0
+        self.logger.log("prev: "+str(self.previous_yaw)+" curr: "+str(self.yaw))
+        self.previous_yaw = self.yaw
+
+
 
 if __name__ == "__main__":
     with serial.Serial(IMU_PORT, 115200, stopbits=2, parity=serial.PARITY_NONE) as serial_port:
