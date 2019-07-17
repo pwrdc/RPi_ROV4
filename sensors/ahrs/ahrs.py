@@ -34,20 +34,20 @@ class AHRS(BaseSensor,IAHRS):
         self.thread.start()
 
     def getter2msg(self):
-        return str(self.get_data())
+        return str(self.get_yaw())
 
     def get_yaw(self):
         """
         :return: yaw - float walue in range [-180,180]
         """
-        return self.ahrs.yaw
+        return self.ahrs.yaw + self.ahrs.yaw_correction
 
     #@Base.multithread_method
     def get_rotation(self):
         '''
         :return: dict with keys: 'yaw', 'pitch', 'roll'
         '''
-        dictionary = {'yaw':self.ahrs.yaw, 'pitch':self.ahrs.pitch,
+        dictionary = {'yaw':self.ahrs.yaw + self.ahrs.yaw_correction, 'pitch':self.ahrs.pitch,
                       'roll':self.ahrs.roll}
         return dictionary
 
@@ -119,6 +119,9 @@ class AHRS_Separate():
         self.logger = Logger(filename='ahrs_test',directory='',logtype='info',timestamp='%Y-%m-%d | %H:%M:%S.%f',logformat='[{timestamp}] {logtype}:    {message}',prefix='',postfix='',title='AHRS logger',logexists='append',console=False) 
         self.close_order = False
 
+        self.yaw_correction = 0.0
+        self.previous_yaw = 0.0
+
     def get_message(self):
         MID = 0
         data = 0
@@ -153,6 +156,8 @@ class AHRS_Separate():
                         break
 
         self._interpret_message(MID, data)
+
+        self.should_fix()
 
     def _interpret_euler(self, data: BytesQueue):
         length = data.pop()
@@ -252,6 +257,17 @@ class AHRS_Separate():
         :return: True if you can use AHRS or False if you can't
         '''
         return os.path.exists(IMU_PORT)
+
+    def should_fix(self):
+        LIMIT = 175.0
+        if self.yaw > (LIMIT+self.yaw_correction) and self.previous_yaw < (-LIMIT+self.yaw_correction):
+            self.yaw_correction -= 360.0
+        elif self.yaw < (-LIMIT+self.yaw_correction) and self.previous_yaw > (LIMIT+self.yaw_correction):
+            self.yaw_correction += 360.0
+        self.logger.log("prev: "+str(self.previous_yaw)+" curr: "+str(self.yaw))
+        self.previous_yaw = self.yaw
+
+
 
 if __name__ == "__main__":
     with serial.Serial(IMU_PORT, 115200, stopbits=2, parity=serial.PARITY_NONE) as serial_port:
