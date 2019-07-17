@@ -58,20 +58,18 @@ class Communication(threading.Thread, ILights, IManipulator, IMovements,
     def power_lights(self, power_supplied):
         self.sensors_refs['Lights'].power_lights(power_supplied)
 
-    def set_movements(self, first_param, second_param):
-        self.sensors_refs['Manipulator'].set_movements(first_param,second_param)
-
-    def set_lin_velocity(self,front,right,up):
+    # Movements
+    def set_lin_velocity(self, front, right, up):
         self.sensors_refs['Movements'].set_lin_velocity(
             front, right, up
         )
 
-    def set_ang_velocity(self,roll,pitch,yaw):
+    def set_ang_velocity(self, roll, pitch, yaw):
         self.sensors_refs['Movements'].set_ang_velocity(
             roll, pitch, yaw
         )
 
-    def move_distance(self,front,right,up):
+    def move_distance(self, front, right, up):
         self.sensors_refs['Movements'].move_distance(
             front, right, up
         )
@@ -129,12 +127,20 @@ class Communication(threading.Thread, ILights, IManipulator, IMovements,
     def is_torpedo_ready(self):
         return self.sensors_refs['Torpedoes'].is_torpedo_ready()
 
-    def fire(self):
+    def torpedoe_fire(self):
         self.sensors_refs['Torpedoes'].fire()
 
-    def power_laser(self, power_supplied):
-        self.sensors_refs['Torpedoes'].power_laser(power_supplied)
+    # Manipulator
+    def set_movements(self, first_param, second_param):
+        self.sensors_refs['Manipulator'].set_movements(first_param, second_param)
 
+    def mainipulator_close_gripper(self):
+        self.sensors_refs['Manipulator'].close_gripper()
+
+    def mainipulator_open_gripper(self):
+        self.sensors_refs['Manipulator'].open_gripper()
+
+    # AHRS
     def get_rotation(self):
         return self.sensors_refs['AHRS'].get_rotation()
 
@@ -147,13 +153,14 @@ class Communication(threading.Thread, ILights, IManipulator, IMovements,
     def get_all_data(self):
         return self.sensors_refs['AHRS'].get_all_data()
 
+    # Depth
     def get_depth(self):
         return self.sensors_refs['DepthSensor'].get_depth()
 
+    # Distance
     def get_front_distance(self):
         return self.sensors_refs['DistanceSensor'].get_front_distance()
 
+    # Hydrophones
     def get_angle(self):
         return self.sensors_refs['HydrophonesPair'].get_angle()
-        
-
