@@ -15,7 +15,7 @@ from control.lights.lights import Lights
 from control.manipulator.manipulator import Manipulator
 from control.torpedoes.torpedoes import Torpedoes
 
-from definitions import DEFLOG, SENSORS, CONTROL, RPI_ADDRESS
+from definitions import MODE, DEFLOG, SENSORS, CONTROL, RPI_ADDRESS
 '''
 Main object (thread) provides all sensors objects
 and passes them to new thread Communication.
@@ -50,7 +50,8 @@ class Main():
                              main_logger=self.logger,
                              local_log=DEFLOG.AHRS_LOCAL_LOG,
                              log_timing=DEFLOG.AHRS_LOG_TIMING,
-                             log_directory=DEFLOG.LOG_DIRECTORY)
+                             log_directory=DEFLOG.LOG_DIRECTORY,
+                             mode=MODE)
         if SENSORS.DEPTH:
             self.depth = DepthSensor(port=ports.DEPTH_CLIENT_PORT,
                                      main_logger=self.logger,
@@ -78,8 +79,7 @@ class Main():
                                    depth_sensor_ref=self.depth,
                                    ahrs_ref=self.ahrs,
                                    main_logger=self.logger,
-                                   local_log=DEFLOG.MOVEMENTS_LOCAL_LOG,
-                                   log_directory=DEFLOG.LOG_DIRECTORY)
+                                   local_log=DEFLOG.MOVEMENTS_LOCAL_LOG)
         if CONTROL.LIGHTS:
             self.lights = Lights(port=ports.LIGHTS_CLIENT_PORT, main_logger=self.logger)
         if CONTROL.MANIPULATOR:

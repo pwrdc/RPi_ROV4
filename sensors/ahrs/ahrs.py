@@ -21,15 +21,17 @@ class AHRS(BaseSensor,IAHRS):
     If AHRS is disconected use virtual class to returning only zeros
 
     '''
-    def __init__(self, port, timeout=200, main_logger=None,
-                 local_log=False, log_directory='logs/', log_timing=0.5):
+    def __init__(self, port, timeout=200, main_logger=None, local_log=False,
+                 log_directory='logs/', log_timing=0.5, mode="ROV4"):
         super(AHRS, self).__init__(port=port,
                                    timeout=timeout,
                                    main_logger=main_logger,
                                    local_log=local_log,
                                    log_directory=log_directory,
                                    log_timing=log_timing)
-        self.ahrs = AHRS_Separate()
+        self.mode = mode
+        if mode != 'SIMULATION':
+            self.ahrs = AHRS_Separate()
         self.thread = threading.Thread(target=self.ahrs.run)
         self.thread.start()
 
@@ -38,18 +40,36 @@ class AHRS(BaseSensor,IAHRS):
 
     def get_yaw(self):
         """
-        :return: yaw - float walue in range [-180,180]
+        :return: yaw - float walue,
+        value takes into account multiple rotations
+        possible values in whole range of real numbers
         """
-        return self.ahrs.yaw + self.ahrs.yaw_correction
+        if self.mode == 'SIMULATION':
+            received = self.get_data()
+            return received['yaw']
+        else:
+            return self.ahrs.yaw + self.ahrs.yaw_correction
 
     #@Base.multithread_method
     def get_rotation(self):
         '''
         :return: dict with keys: 'yaw', 'pitch', 'roll'
         '''
-        dictionary = {'yaw':self.ahrs.yaw + self.ahrs.yaw_correction, 'pitch':self.ahrs.pitch,
-                      'roll':self.ahrs.roll}
-        return dictionary
+        if self.mode == 'SIMULATION':
+            received = self.get_data()
+            output = {}
+            if received != None:
+                #received = ast.literal_eval(received)
+                output['yaw'] = received['yaw']
+                output['pitch'] = received['pitch']
+                output['roll'] = received['roll']
+                return output
+            else:
+                return None
+        else:
+            dictionary = {'yaw': self.ahrs.yaw, 'pitch': self.ahrs.pitch,
+                          'roll': self.ahrs.roll}
+            return dictionary
 
     #@Base.multithread_method
     def get_linear_accelerations(self):
@@ -57,9 +77,22 @@ class AHRS(BaseSensor,IAHRS):
         :return: dictionary with keys "lineA_x"
         "lineA_y", lineA_z"
         '''
-        return {'lineA_x': self.ahrs.free_acc[0],
-                'lineA_y': self.ahrs.free_acc[1],
-                'lineA_z': self.ahrs.free_acc[2]}
+        if self.mode == 'SIMULATION':
+            received = self.get_data()
+            output = {}
+            print(received)
+            if received != None:
+                #received = ast.literal_eval(received)
+                output['lineA_x'] = received['lineA_x']
+                output['lineA_y'] = received['lineA_y']
+                output['lineA_z'] = received['lineA_z']
+                return output
+            else:
+                return None
+        else:
+            return {'lineA_x': self.ahrs.free_acc[0],
+                    'lineA_y': self.ahrs.free_acc[1],
+                    'lineA_z': self.ahrs.free_acc[2]}
 
     #@Base.multithread_method
     def get_angular_accelerations(self):
@@ -67,9 +100,22 @@ class AHRS(BaseSensor,IAHRS):
         :return: dictionary with keys "angularA_x"
         "angularA_y", angularA_z"
         '''
-        return {"angularA_x": self.ahrs.rate_of_turn[0],
-                "angularA_y": self.ahrs.rate_of_turn[1],
-                "angularA_z": self.ahrs.rate_of_turn[2]}
+        if self.mode == 'SIMULATION':
+            received = self.get_data()
+            output = {}
+            print(received)
+            if received != None:
+                #received = ast.literal_eval(received.decode("utf-8"))
+                output['angularA_x'] = received['angularA_x']
+                output['angularA_y'] = received['angularA_x']
+                output['angularA_z'] = received['angularA_x']
+                return output
+            else:
+                return None
+        else:
+            return {"angularA_x": self.ahrs.rate_of_turn[0],
+                    "angularA_y": self.ahrs.rate_of_turn[1],
+                    "angularA_z": self.ahrs.rate_of_turn[2]}
 
     #@Base.multithread_method
     def get_all_data(self):
@@ -79,10 +125,13 @@ class AHRS(BaseSensor,IAHRS):
         "lineA_x","lineA_y","lineA_z","angularA_x",
         "angularA_y","angularA_z"
         '''
-        rot = self.get_rotation()
-        lin_acc = self.get_linear_accelerations()
-        ang_acc = self.get_angular_accelerations()
-        return {**rot, **lin_acc, **ang_acc}
+        if self.mode == 'SIMULATION':
+            return self.get_data()
+        else:
+            rot = self.get_rotation()
+            lin_acc = self.get_linear_accelerations()
+            ang_acc = self.get_angular_accelerations()
+            return {**rot, **lin_acc, **ang_acc}
 
 
 IMU_PORT = '/dev/ttyUSB0'
