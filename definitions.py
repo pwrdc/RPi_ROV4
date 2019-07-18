@@ -6,10 +6,10 @@ MODE = "ROV4"  # 'ROV3' or 'ROV4' or 'SIMULATION'
 if MODE == 'SIMULATION':
     RPI_ADDRESS = '127.0.0.1'  # local address
 else:
-    RPI_ADDRESS = '192.168.0.101'  # RPi address
+    RPI_ADDRESS = '192.168.0.100'  # RPi address
 
 class DEFLOG:
-    LOG_DIRECTORY = "logs/"
+    LOG_DIRECTORY = "logs/RPi/"
 
     DEPTH_LOCAL_LOG = True
     DEPTH_LOG_TIMING = 0.1

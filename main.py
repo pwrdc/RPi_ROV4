@@ -1,3 +1,14 @@
+'''
+Main object (thread) provides all sensors objects
+and passes them to new thread Communication.
+Communication thread is responsible of handling
+Pyro4 server and requests to it.
+
+Communication class has its own methods to all features it handles.
+It is backed by easier use of Communication class from Xavier level.
+(You don't have to know key of each sensor in sensor references dictionary)
+
+'''
 from logpy.LogPy import Logger
 import threading
 from communication.communication import Communication
@@ -16,17 +27,6 @@ from control.manipulator.manipulator import Manipulator
 from control.torpedoes.torpedoes import Torpedoes
 
 from definitions import MODE, DEFLOG, SENSORS, CONTROL, RPI_ADDRESS
-'''
-Main object (thread) provides all sensors objects
-and passes them to new thread Communication.
-Communication thread is responsible of handling
-Pyro4 server and requests to it.
-
-Communication class has its own methods to all features it handles.
-It is backed by easier use of Communication class from Xavier level.
-(You don't have to know key of each sensor in sensor references dictionary)
-
-'''
 
 
 class Main():
@@ -79,7 +79,8 @@ class Main():
                                    depth_sensor_ref=self.depth,
                                    ahrs_ref=self.ahrs,
                                    main_logger=self.logger,
-                                   local_log=DEFLOG.MOVEMENTS_LOCAL_LOG)
+                                   local_log=DEFLOG.MOVEMENTS_LOCAL_LOG,
+                                   log_directory=DEFLOG.LOG_DIRECTORY)
         if CONTROL.LIGHTS:
             self.lights = Lights(port=ports.LIGHTS_CLIENT_PORT, main_logger=self.logger)
         if CONTROL.MANIPULATOR:
