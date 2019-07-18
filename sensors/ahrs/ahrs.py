@@ -1,3 +1,5 @@
+# TODO replace direct ahrs connection with server
+
 from sensors.ahrs.ahrs_itf import IAHRS
 from sensors.base_sensor import BaseSensor
 import ast
@@ -15,14 +17,14 @@ from threading import Thread
 """
 
 
-class AHRS(BaseSensor,IAHRS):
+class AHRS(BaseSensor, IAHRS):
     '''
     class for accessing AHRS data using direct access to ahrs thread
     If AHRS is disconected use virtual class to returning only zeros
 
     '''
     def __init__(self, port, timeout=200, main_logger=None, local_log=False,
-                 log_directory='logs/', log_timing=0.5, mode="ROV4"):
+                 log_directory='', log_timing=0.5, mode="ROV4"):
         super(AHRS, self).__init__(port=port,
                                    timeout=timeout,
                                    main_logger=main_logger,
@@ -31,7 +33,7 @@ class AHRS(BaseSensor,IAHRS):
                                    log_timing=log_timing)
         self.mode = mode
         if mode != 'SIMULATION':
-            self.ahrs = AHRS_Separate()
+            self.ahrs = AHRS_Separate(log_directory)
         self.thread = threading.Thread(target=self.ahrs.run)
         self.thread.start()
 
@@ -160,12 +162,14 @@ class AHRS_Separate():
     free_acc = [0, 0, 0]
     rate_of_turn = [0, 0, 0]
 
-    def __init__(self):
-        self.serial =  serial.Serial(IMU_PORT, 115200, stopbits=2, parity=serial.PARITY_NONE)
+    def __init__(self, log_direcory=""):
+        self.serial = serial.Serial(IMU_PORT, 115200, stopbits=2, parity=serial.PARITY_NONE)
         self.lock_rate_of_turn = threading.Lock()
         self.lock_free_acc = threading.Lock()
         self.lock_angular_pos = threading.Lock()
-        self.logger = Logger(filename='ahrs_test',directory='',logtype='info',timestamp='%Y-%m-%d | %H:%M:%S.%f',logformat='[{timestamp}] {logtype}:    {message}',prefix='',postfix='',title='AHRS logger',logexists='append',console=False) 
+        self.logger = Logger(filename='ahrs_separate', directory=log_direcory, logtype='info',
+                             logformat='[{timestamp}] {logtype}:    {message}',
+                             title='AHRS logger', logexists='append', console=False) 
         self.close_order = False
 
         self.yaw_correction = 0.0
