@@ -149,17 +149,17 @@ class Communication(threading.Thread, ILights, IManipulator, IMovements,
     def is_torpedo_ready(self):
         return self.sensors_refs['Torpedoes'].is_torpedo_ready()
 
-    def torpedoe_fire(self):
+    def fire_torpedo(self):
         self.sensors_refs['Torpedoes'].fire()
 
     # Manipulator
     def set_movements(self, first_param, second_param):
         self.sensors_refs['Manipulator'].set_movements(first_param, second_param)
 
-    def mainipulator_close_gripper(self):
+    def close_gripper(self):
         self.sensors_refs['Manipulator'].close_gripper()
 
-    def mainipulator_open_gripper(self):
+    def open_gripper(self):
         self.sensors_refs['Manipulator'].open_gripper()
 
     # AHRS

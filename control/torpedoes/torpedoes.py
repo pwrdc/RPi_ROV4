@@ -5,7 +5,7 @@ class Torpedoes(BaseController,ITorpedoes):
     def is_torpedo_ready(self):
         pass
 
-    def fire(self):
+    def fire_torpedo(self):
         self._send_data('Fire')
 
     def power_laser(self, power_supplied):

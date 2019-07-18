@@ -17,16 +17,8 @@ class ITorpedoes(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def fire(self):
+    def fire_torpedo(self):
         """
         Lunch single torpedo
-        """
-        pass
-
-    @abc.abstractmethod
-    def power_laser(self, power_supplied):
-        """
-        Turn laser on or off
-        :param power_supplied: True - laser is turned on
         """
         pass
