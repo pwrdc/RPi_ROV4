@@ -8,8 +8,5 @@ class Torpedoes(BaseController,ITorpedoes):
     def fire_torpedo(self):
         self._send_data('Fire')
 
-    def power_laser(self, power_supplied):
-        self._send_data(power_supplied)
-
     def getter2msg(self):
         pass 
