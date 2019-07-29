@@ -86,8 +86,12 @@ class Main():
         if CONTROL.MANIPULATOR:
             self.manipulator = Manipulator(port=ports.MANIP_CLIENT_PORT, main_logger=self.logger)
         if CONTROL.TORPEDOES:
-            self.torpedoes = Torpedoes(port=ports.TORPEDO_CLIENT_PORT, main_logger=self.logger)
-        
+            self.torpedoes = Torpedoes(fire_client_port=ports.TORPEDO_FIRE_CLIENT_PORT,
+                                       ready_driver_port=ports.TORPEDO_READY_DRIVER_PORT,
+                                       main_logger=self.logger,
+                                       local_log=DEFLOG.TORPEDOES_LOCAL_LOG,
+                                       log_directory=DEFLOG.LOG_DIRECTORY)
+
         #Run threads, in control for local logers
 
         self.logger.start()
