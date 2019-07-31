@@ -18,7 +18,7 @@ class HydrophonesPair(IHydrophonesPair):
 
     #@Base.multithread_method
     def get_angle(self, pinger_freq):
-        os.system('arecord -c 2 -D plughw:0,0 -f S16_LE -r96000 --duration=2 signal%s.wav' %(str(self.wav_file_count)))
+        #os.system('arecord -c 2 -D plughw:0,0 -f S16_LE -r96000 --duration=2 signal%s.wav' %(str(self.wav_file_count)))
         data, fs = sf.read('signal%s.wav' %(str(self.wav_file_count)))
         self.wav_file_count += 1
         data = data.transpose()
@@ -80,6 +80,8 @@ class HydrophonesPair(IHydrophonesPair):
             angle = 3.7762*phase_delta**3 - 1.1658*phase_delta**2 - 64.274*phase_delta + 7.124
         elif freq == 30000:
             angle = -0.5659*phase_delta**3 - 4.0424*phase_delta**2 - 48.973*phase_delta +3.2175
+        elif freq == 35000:
+            angle = -43*phase_delta + 0.9
         elif freq == 40000:
             angle = -5.4937*phase_delta**3 + 3.1092*phase_delta**2 - 17.501*phase_delta - 3.0393
         else:
@@ -97,10 +99,5 @@ class HydrophonesPair(IHydrophonesPair):
     
 if __name__ == '__main__':
     a = HydrophonesPair()
-    a.get_angle(40000)
-    a.get_angle(40000)
-    a.get_angle(40000)
-    a.get_angle(40000)
-    a.get_angle(40000)
-    
+    a.get_angle(30000)
     
