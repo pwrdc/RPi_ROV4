@@ -25,6 +25,7 @@ from control.movements.movements import Movements
 from control.lights.lights import Lights
 from control.manipulator.manipulator import Manipulator
 from control.torpedoes.torpedoes import Torpedoes
+from control.dropper.dropper import Dropper
 
 from definitions import MODE, DEFLOG, SENSORS, CONTROL, RPI_ADDRESS
 
@@ -75,6 +76,7 @@ class Main():
         self.lights = None
         self.manipulator = None
         self.torpedoes = None
+        self.dropper = None
         self.movements = Movements(port=ports.ENGINE_SLAVE_PORT,
                                    depth_sensor_ref=self.depth,
                                    ahrs_ref=self.ahrs,
@@ -91,6 +93,8 @@ class Main():
                                        main_logger=self.logger,
                                        local_log=DEFLOG.TORPEDOES_LOCAL_LOG,
                                        log_directory=DEFLOG.LOG_DIRECTORY)
+        if CONTROL.DROPPER:
+            self.dropper = Dropper()
 
         #Run threads, in control for local logers
 
@@ -120,7 +124,8 @@ class Main():
             'Movements':self.movements,
             'Lights':self.lights,
             'Manipulator':self.manipulator,
-            'Torpedoes':self.torpedoes
+            'Torpedoes':self.torpedoes,
+            'dropper':self.dropper
         }
         #Here you can add more feature classes
         #Remeber then to provide proper Communication class methods

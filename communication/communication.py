@@ -75,6 +75,7 @@ class Communication(threading.Thread, ILights, IManipulator, IMovements,
         )
 
     def rotate_angle(self, roll, pitch, yaw):
+        #self.pid_set_yaw(self.get_yaw()+yaw)
         self.sensors_refs['Movements'].rotate_angle(
             roll, pitch, yaw
         )
@@ -189,3 +190,7 @@ class Communication(threading.Thread, ILights, IManipulator, IMovements,
     # Hydrophones
     def get_angle(self):
         return self.sensors_refs['HydrophonesPair'].get_angle()
+
+    # dropper
+    def drop_marker(self):
+        self.sensors_refs['dropper'].drop()
