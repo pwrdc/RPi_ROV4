@@ -73,7 +73,7 @@ class PIDdepth(Base, IPID):
         self.DTerm = 0.0
         self.last_error = 0.0
         self.int_error = 0.0
-        self.windup_guard = 1.0
+        self.windup_guard = 0.25 #1.0
         self.output = 0.0
 
     def update(self, feedback_value):
@@ -174,10 +174,10 @@ class PIDdepth(Base, IPID):
 
     @staticmethod
     def val_to_range(val):
-        if val < -1:
-            return -1.0
-        if val > 1:
-            return 1.0
+        if val < -0.25:
+            return -0.25
+        if val > 0.25:
+            return 0.25
         return val
 
     def set_velocities(self, front=0, right=0, up=0, roll=0, pitch=0, yaw=0):
