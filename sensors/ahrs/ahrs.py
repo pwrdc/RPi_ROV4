@@ -313,9 +313,9 @@ class AHRS_Separate():
 
     def should_fix(self):
         LIMIT = 175.0
-        if self.yaw > (LIMIT+self.yaw_correction) and self.previous_yaw < (-LIMIT+self.yaw_correction):
+        if self.yaw > LIMIT and self.previous_yaw < -LIMIT:
             self.yaw_correction -= 360.0
-        elif self.yaw < (-LIMIT+self.yaw_correction) and self.previous_yaw > (LIMIT+self.yaw_correction):
+        elif self.yaw  < -LIMIT and self.previous_yaw > LIMIT:
             self.yaw_correction += 360.0
         self.logger.log("prev: "+str(self.previous_yaw)+" curr: "+str(self.yaw))
         self.previous_yaw = self.yaw
