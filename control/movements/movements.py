@@ -44,6 +44,7 @@ class Movements(BaseController, IMovements):
         self.pid_depth.run()
         self.pid_yaw.run()
         self.ahrs = ahrs_ref
+        self.get_depth = depth_sensor_ref.get_depth
 
     def set_lin_velocity(self, front, right, up):
         """
@@ -52,6 +53,10 @@ class Movements(BaseController, IMovements):
         @param: right int in range [-100, 100], case negative value move down
         @param: up int in range [-100,100], case negative value move down
         """
+        if up > 0.0001 or up < -0.0001:
+            self.pid_depth_turn_off()
+        else:
+            self.pid_depth_turn_on()
         self.pid_depth.set_velocities(front/100, right/100, up/100)
 
     def set_ang_velocity(self, roll, pitch, yaw):
@@ -61,6 +66,10 @@ class Movements(BaseController, IMovements):
         @param: pitch int in range [-100, 100], case negative - reverse direction
         @param: yaw int in range [-100,100], case negative - reverse direction
         """
+        if yaw > 0.0001 or yaw < -0.0001:
+            self.pid_yaw_turn_off()
+        else:
+            self.pid_yaw_turn_on()
         self.pid_depth.set_velocities(yaw=yaw/100)
 
     def move_distance(self, front, right, up):
@@ -71,7 +80,17 @@ class Movements(BaseController, IMovements):
         @param: up float in range [-10,10], case negative value move down
         Not shure if it is going to work correctly
         """
-        pass
+        ENIGNE_POWER = 25
+        self.set_lin_velocity(ENIGNE_POWER*self.sign(front), 0, 0)
+        time.sleep(front)
+
+        self.set_lin_velocity(0, ENIGNE_POWER*self.sign(right), 0)
+        time.sleep(right)
+
+        self.set_lin_velocity(0, 0, 0)
+
+        self.pid_set_depth(self.get_depth+up)
+
 
     def rotate_angle(self, roll, pitch, yaw):
         """
@@ -81,28 +100,7 @@ class Movements(BaseController, IMovements):
         @param: yaw float in range [-180, 180], case negative - reverse direction
 
         """
-        allowed_error = 5 # in degrees
-        break_factor = 0.2 # greater value => faster speed down
-
-        direction = copysign(1, yaw)
-        dest_yaw = self.ahrs.get_rotation()["yaw"] + yaw
-        break_angle = break_factor * yaw
-        if abs(dest_yaw) > 180:
-            dest_yaw -= copysign(360, dest_yaw)
-        stop = False
-        breaking = False
-        while not stop:
-            error = dest_yaw - self.ahrs.get_rotation()["yaw"]
-            self.log("rotation: error "+str(error))
-            if abs(error) > allowed_error:
-                if not breaking and (abs(error) <= break_angle):
-                    direction *= -1
-                    breaking = True
-                self.set_engine_driver_values(0, 0, 0, 0, 0, direction)
-                self.log("val of rotation: "+str(direction))
-                time.sleep(0.001)
-            else:
-                stop = True
+        self.pid_set_yaw(self.ahrs.get_yaw()+yaw)
 
     def pid_hold_depth(self):
         self.pid_depth.hold_depth()
@@ -189,6 +187,14 @@ class Movements(BaseController, IMovements):
             if key != 'self' and key != 'dic' and value != None:
                 dic[key] = value
         return dic
+
+    @staticmethod
+    def sign(val):
+        if val > 0:
+            return 1
+        elif val < 0:
+            return -1
+        return 0
 
 if __name__=='__main__':
     movements = Movements(None,None, None)
