@@ -62,8 +62,8 @@ class Communication(threading.Thread, ILights, IManipulator, IMovements,
     def lights_turn_on(self):
         self.sensors_refs['Lights'].turn_on()
 
-    def lights_turn_off(self);
-        self.sensor_refs('Lights').turn_off()
+    def lights_turn_off(self):
+        self.sensors_refs['Lights'].turn_off()
 
     # Movements
     def set_lin_velocity(self, front, right, up):

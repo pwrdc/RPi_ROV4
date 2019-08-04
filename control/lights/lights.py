@@ -10,9 +10,9 @@ class Lights(BaseController,ILights):
             0 - means turn lights off
             100 - stet lights to maxiumum brightness
         '''
-        power_supplied = str(power_supplied)
+        power_supplied = {'power':power_supplied}
         self._send_data(power_supplied)
-        self.log('Lights set to '+power_supplied)
+        self.log('Lights set to '+str(power_supplied))
 
     def turn_on(self):
         self.power_lights(100)

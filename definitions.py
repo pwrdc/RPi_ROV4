@@ -34,7 +34,7 @@ class SENSORS:
     DISTANCE = False
 
 class CONTROL:
-    LIGHTS = False
+    LIGHTS = True
     MANIPULATOR = False
     TORPEDOES = False
     DROPPER = False

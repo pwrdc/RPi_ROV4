@@ -84,7 +84,9 @@ class Main():
                                    local_log=DEFLOG.MOVEMENTS_LOCAL_LOG,
                                    log_directory=DEFLOG.LOG_DIRECTORY)
         if CONTROL.LIGHTS:
-            self.lights = Lights(port=ports.LIGHTS_CLIENT_PORT, main_logger=self.logger)
+            self.lights = Lights(port=ports.LIGHTS_CLIENT_PORT,
+                                 main_logger=self.logger,
+                                 log_directory=DEFLOG.LOG_DIRECTORY)
         if CONTROL.MANIPULATOR:
             self.manipulator = Manipulator(port=ports.MANIP_CLIENT_PORT, main_logger=self.logger)
         if CONTROL.TORPEDOES:
@@ -112,7 +114,7 @@ class Main():
         if CONTROL.MANIPULATOR:
             self.manipulator.run()
         if CONTROL.LIGHTS:
-            self.manipulator.run()
+            self.lights.run()
         if CONTROL.TORPEDOES:
             self.torpedoes.run()
         
