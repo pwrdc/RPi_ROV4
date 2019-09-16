@@ -11,13 +11,15 @@ range = 1000
 
 
 class Dropper:
-	def __init__(self):
-		self.position =0
+	def __init__(self,logger):
+		self._logger = logger
+		self.position = 0
 
 		self.pi = pigpio.pi()
 
 		print("setup")
 		self.setup()
+		self.close()
 
 	def setup(self):
 		self.pi.set_PWM_frequency(PWM_serwo, PWM_frequency)
@@ -34,16 +36,23 @@ class Dropper:
 		self.set_position(neutral)
 
 	def drop(self):
+		self.log("drop marker")
 		if self.position == 0:
 			self.set_position(position_1)
+			self.log("first marker")
 		else:
+			self.log("drop second marker")
 			self.set_position(position_2)
-			dropper.open()
+			self.open()
 			time.sleep(1)
-			#dropper.close()
+			#self.close()
 			self.pi.stop()
 
 		self.position+=1
+
+	def log(self, msg):
+		if self._logger:
+			self._logger.log(msg)
 
 	
 
@@ -51,7 +60,7 @@ class Dropper:
 if __name__ == "__main__":
 	#if not self.pi.connected:
 	#	exit()
-	dropper = Dropper()
+	dropper = Dropper(None)
 	dropper.drop()
 	time.sleep(4)
 

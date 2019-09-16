@@ -94,7 +94,7 @@ class Main():
                                        local_log=DEFLOG.TORPEDOES_LOCAL_LOG,
                                        log_directory=DEFLOG.LOG_DIRECTORY)
         if CONTROL.DROPPER:
-            self.dropper = Dropper()
+            self.dropper = Dropper(self.logger)
 
         #Run threads, in control for local logers
 
