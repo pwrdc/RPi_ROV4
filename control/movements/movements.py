@@ -56,8 +56,11 @@ class Movements(BaseController, IMovements):
         if up > 0.0001 or up < -0.0001:
             self.pid_depth_turn_off()
         else:
-            self.pid_depth_turn_on()
+            self.pid_depth_turn_on() #TODO
         self.pid_depth.set_velocities(front/100, right/100, up/100)
+
+        msg = "sset_lin vel: front: "+str(front)+";right: "+str(right)+";up: "+str(up)+";up: "+str(up)
+        self.log(msg)
 
     def set_ang_velocity(self, roll, pitch, yaw):
         """
@@ -80,16 +83,21 @@ class Movements(BaseController, IMovements):
         @param: up float in range [-10,10], case negative value move down
         Not shure if it is going to work correctly
         """
+        print("move distance")
         ENIGNE_POWER = 25
         self.set_lin_velocity(ENIGNE_POWER*self.sign(front), 0, 0)
-        time.sleep(front)
+        if front<0:
+            front = -front
+        time.sleep(front*5)
 
         self.set_lin_velocity(0, ENIGNE_POWER*self.sign(right), 0)
-        time.sleep(right)
+        if right<0:
+            right = -right
+        time.sleep(right*5)
 
         self.set_lin_velocity(0, 0, 0)
 
-        self.pid_set_depth(self.get_depth+up)
+        #self.pid_set_depth(self.get_depth()+up)
 
 
     def rotate_angle(self, roll, pitch, yaw):
@@ -107,7 +115,7 @@ class Movements(BaseController, IMovements):
         self.log("movments: pid_hold_depth")
 
     def pid_depth_turn_on(self):
-        self.pid_hold_depth() #temporary
+        #self.pid_hold_depth() #temporary
         self.pid_depth.turn_on_pid()
         self.log("movments: pid_turn_on")
 
@@ -124,6 +132,7 @@ class Movements(BaseController, IMovements):
         :param: depth - float - target depth for PID
         """
         self.pid_depth.set_depth(depth)
+        self.log("set depth to "+str(depth))
 
     def pid_hold_yaw(self):
         self.pid_yaw.hold_yaw()
@@ -175,8 +184,8 @@ class Movements(BaseController, IMovements):
 
     def send_values_to_engines(self, front, right, up, roll, pitch, yaw):
         self._send_data(self.to_dict(front, right, up, roll, pitch, yaw))
-        msg = "data sended: front: "+str(front)+";right: "+str(right)+";up: "+str(up)+";yaw: "+str(yaw)
-        self.log(msg)
+        #msg = "data sended: front: "+str(front)+";right: "+str(right)+";up: "+str(up)+";yaw: "+str(yaw)
+        #self.log(msg)
 
     def to_dict(self, front=None, right=None, up=None, roll=None, pitch=None, yaw=None):
         '''
