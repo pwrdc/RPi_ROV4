@@ -55,8 +55,15 @@ class Communication(threading.Thread, ILights, IManipulator, IMovements,
         daemon.requestLoop()
         #Starting Pyro4 server loop
 
+    # Lights
     def power_lights(self, power_supplied):
         self.sensors_refs['Lights'].power_lights(power_supplied)
+
+    def lights_turn_on(self):
+        self.sensors_refs['Lights'].turn_on()
+
+    def lights_turn_off(self);
+        self.sensor_refs('Lights').turn_off()
 
     # Movements
     def set_lin_velocity(self, front, right, up):
