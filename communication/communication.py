@@ -34,6 +34,9 @@ class Communication(threading.Thread, ILights, IManipulator, IMovements,
 
         #sensor_refs is used to store references to all objects passed from main thread
 
+        #Open movements_path
+        m_path = open("movements_path", "w")
+
         daemon = Pyro4.Daemon(str(rpi_address))
 
         try:
@@ -85,6 +88,18 @@ class Communication(threading.Thread, ILights, IManipulator, IMovements,
         self.sensors_refs['Movements'].set_engine_driver_values(
             front, right, up, roll, pitch, yaw
         )
+        #Movements saving
+        moves = [front, right, up, roll, pitch, yaw]
+
+        if m_path:
+            for single_m in moves:
+                if single_m:
+                    m_path.write(single_m + " ")
+        else:
+            m_path = open("movements_path", "w")
+            for single_m in moves:
+                if single_m:
+                    m_path.write(single_m + " ")
 
     # Movements pid - depth
     def pid_depth_turn_on(self):

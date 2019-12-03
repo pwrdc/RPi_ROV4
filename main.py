@@ -29,6 +29,8 @@ from control.dropper.dropper import Dropper
 
 from definitions import MODE, DEFLOG, SENSORS, CONTROL, RPI_ADDRESS
 
+import time
+
 
 class Main():
     '''
@@ -135,6 +137,12 @@ class Main():
         Communication class parameters are: sensors_refs, rpi_address,
         main_logger, local_logger, log_directory (last three are optional)
         '''
+
+        m_path = open("movements_path", "r")
+        splited = list(m_path)[0].split()
+        for move in splited:
+            Communication.set_engine_driver_values(move)
+            time.sleep(0.01)
 
 
 
