@@ -1,7 +1,7 @@
 """
 File contains definitions of const values in code
 """
-MODE = "ROV4"  # 'ROV3' or 'ROV4' or 'SIMULATION'
+MODE = "SIMULATION"  # 'ROV3' or 'ROV4' or 'SIMULATION'
 
 if MODE == 'SIMULATION':
     RPI_ADDRESS = '127.0.0.1'  # local address
@@ -50,6 +50,10 @@ class PID_DEPTH:
         KP = 3.69
         KI = 0.0
         KD = 0.84
+    elif MODE == 'SIMULATION':
+        KP = 3.69
+        KI = 0.0
+        KD = 0.84    
 
 class PID_YAW:
     KP = 0.04 #0.0

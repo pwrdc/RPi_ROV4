@@ -37,7 +37,7 @@ class DepthSensor(BaseSensor, IDepthSensor):
             current_depth = self.get_data()
             if current_depth:
                 self.depth = float(current_depth)
-            time.sleep(0.01)
+            time.sleep(0.1)
 
     def getter2msg(self):
         return str(self.get_depth())

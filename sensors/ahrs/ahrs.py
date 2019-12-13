@@ -34,8 +34,8 @@ class AHRS(BaseSensor, IAHRS):
         self.mode = mode
         if mode != 'SIMULATION':
             self.ahrs = AHRS_Separate(log_directory)
-        self.thread = threading.Thread(target=self.ahrs.run)
-        self.thread.start()
+            self.thread = threading.Thread(target=self.ahrs.run)
+            self.thread.start()
 
     def getter2msg(self):
         return str(self.get_yaw())
