@@ -6,19 +6,20 @@ przerzucić do głównego folderu
 """
 
 import time
-from sensors.ahrs.ahrs import AHRS
+
 import numpy as np
 from math import sin, cos, radians, pi
 from communication.rpi_drivers import ports
 
 
 class InertialNavigation():
-    def __init__(self, initial_state, is_orientation_simplified=False):
-        self.ahrs = AHRS(port=ports.AHRS_CLIENT_PORT)
+    def __init__(self, initial_state, ahrs_ref, is_orientation_simplified=False):
+        self.ahrs = ahrs_ref
+
         self.is_orientation_simplified = is_orientation_simplified
 
         # słownik wejściowy z ahrs z wartościami 0
-        acc_sample_template = self.ahrs.get_inertial_navigation_data()
+        acc_sample_template = self.ahrs.get_data()
         for key in acc_sample_template:
             acc_sample_template[key] = 0
 
@@ -50,7 +51,7 @@ class InertialNavigation():
         self.pos_sample = initial_state.copy()
 
         # do obrotu układu ahrs do układu z initial_state
-        self.yaw_correction = self.ahrs.get_inertial_navigation_data()["yaw"]
+        self.yaw_correction = self.ahrs.get_data()["yaw"]
 
         self.file_log = open("inertial_navigation_log.txt", "w")
 
@@ -61,7 +62,7 @@ class InertialNavigation():
             # przesunięcie próbek, dodanie nowej próbki z AHRS
             self.acc_samples[2] = self.acc_samples[1].copy()
             self.acc_samples[1] = self.acc_samples[0].copy()
-            self.acc_samples[0] = self.ahrs.get_inertial_navigation_data()
+            self.acc_samples[0] = self.ahrs.get_data()
             self.vel_samples[1] = self.vel_samples[0].copy()
 
             # pobranie orientacji prosto z ahrs, bez przeliczania z przyspieszeń
@@ -84,7 +85,7 @@ class InertialNavigation():
 
             #return self.pos_sample
 
-            self.file_log.write(self.pos_sample)
+            self.file_log.write(str(self.pos_sample))
             time.sleep(0.0025)
 
     # przemieszczenie we współrzędnych wewnętrznych

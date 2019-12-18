@@ -9,6 +9,7 @@ import time
 import serial
 import os
 from logpy.LogPy import Logger
+IMU_PORT = '/dev/ttyUSB0'
 
 """
 from sensors.ahrs.ahrs_separate import AHRS_Separate
@@ -36,6 +37,9 @@ class AHRS(BaseSensor, IAHRS):
             self.ahrs = AHRS_Separate(log_directory)
         self.thread = threading.Thread(target=self.ahrs.run)
         self.thread.start()
+
+    def get_data(self):
+        return self.ahrs.get_data()
 
     def getter2msg(self):
         return str(self.get_yaw())
@@ -150,7 +154,7 @@ class AHRS(BaseSensor, IAHRS):
             return {**rot, **lin_acc}
 
 
-IMU_PORT = '/dev/ttyUSB0'
+
 
 class BytesQueue:
     def __init__(self, buffer: bytes):
@@ -308,6 +312,8 @@ class AHRS_Separate():
             data['angularA_x'] = (self.rate_of_turn[0])
             data['angularA_y'] = (self.rate_of_turn[1])
             data['angularA_z'] = (self.rate_of_turn[2])
+
+            data["time"] = time.time()
         return data
 
     def run(self):

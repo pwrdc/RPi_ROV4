@@ -49,10 +49,7 @@ class Main():
         self.distance = None
         self.inertial_navigation = None
 
-        if SENSORS.INERTIAL_NAVIGATION:
-            self.inertial_navigation = InertialNavigation(INERTIAL_NAVIGATION.INITIAL_STATE,
-                                                          INERTIAL_NAVIGATION.IS_ORIENTATION_SIMPLIFIED)
-        '''
+        
         if SENSORS.AHRS:
             self.ahrs = AHRS(port=ports.AHRS_CLIENT_PORT,
                              main_logger=self.logger,
@@ -60,7 +57,7 @@ class Main():
                              log_timing=DEFLOG.AHRS_LOG_TIMING,
                              log_directory=DEFLOG.LOG_DIRECTORY,
                              mode=MODE)
-        '''
+        
         if SENSORS.DEPTH:
             self.depth = DepthSensor(port=ports.DEPTH_CLIENT_PORT,
                                      main_logger=self.logger,
@@ -104,19 +101,20 @@ class Main():
         if CONTROL.DROPPER:
             self.dropper = Dropper(self.logger)
 
+        
+
         #Run threads, in control for local logers
 
         self.logger.start()
         if SENSORS.DEPTH:
             self.depth.run()
-        #if SENSORS.AHRS:
-        #    self.ahrs.run()
+        if SENSORS.AHRS:
+            self.ahrs.run()
         if SENSORS.HYDROPHONES:
             self.hydrophones.run()
         if SENSORS.DISTANCE:
             self.distance.run()
-        if SENSORS.INERTIAL_NAVIGATION:
-            self.inertial_navigation.run()
+        
 
         self.movements.run()
         if CONTROL.MANIPULATOR:
@@ -136,9 +134,21 @@ class Main():
             'Manipulator':self.manipulator,
             'Torpedoes':self.torpedoes,
             'dropper':self.dropper
-        }
+        }        
+
+
         #Here you can add more feature classes
         #Remeber then to provide proper Communication class methods
+
+
+        if SENSORS.INERTIAL_NAVIGATION:
+            self.inertial_navigation = InertialNavigation(INERTIAL_NAVIGATION.INITIAL_STATE,
+                                                          self.ahrs,
+                                                          INERTIAL_NAVIGATION.IS_ORIENTATION_SIMPLIFIED)
+
+        if SENSORS.INERTIAL_NAVIGATION:
+            self.inertial_navigation.run()
+
 
         self.comm = Communication(self.sensors_refs, RPI_ADDRESS, main_logger=self.logger)
         '''
@@ -146,7 +156,7 @@ class Main():
         main_logger, local_logger, log_directory (last three are optional)
         '''
 
-
+        
 
 if __name__== "__main__":
     main = Main()
