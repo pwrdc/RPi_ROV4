@@ -62,7 +62,6 @@ class InertialNavigation():
         keys = ["yaw", "pitch", "roll"]
         for key in keys:
             self.dis_sample[key] = self.acc_samples[0]["key"]
-            self.pos_sample[key] = self.acc_samples[0]["key"]
 
         # przemieszczenie w lokalnym układzie współrzędnych
         self.get_internal_displacement()
