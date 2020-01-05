@@ -1,25 +1,31 @@
 """
 TODO:
 integracja (oczywiście)
-czy w get_global_displacement kąty nie będą przyjmowały niewłaściwych wartości
-    przy przejściu przez -pi/2 i pi/2 między próbkami (patrz yaw_wykres.png)
-initial_state, razem z początkową orientacją (tylko yaw)
-    (orientacja z AHRS -> orientacja względem lokalnego układu, np. zwiazanego z basenem)
-orientacja AHRS -> orientacja łodzi (bo może być krzywo zamontowany)
-test na gotowych danych z ahrs.csv
+obsługa przejścia przez końce zakresu dla yaw
 """
 
-from sensors.ahrs import ahrs
+#from sensors.ahrs import ahrs
 import numpy as np
-from math import sin, cos
+from math import sin, cos, radians
+
+INITIAL_STATE = {"time": 0,
+                 "yaw": radians(-100.0556640625),
+                 "pitch": 0,
+                 "roll": 0,
+                 "lineP_x": 0,
+                 "lineP_y": 0,
+                 "lineP_z": 0
+                 }
 
 class InertialNavigation():
     def __init__(self, ahrs, initial_state, is_orientation_simplified=False):
+        self.line_counter = 0
+
         self.ahrs = ahrs
         self.is_orientation_simplified = is_orientation_simplified
 
         # słownik wejściowy z ahrs z wartościami 0
-        acc_sample_template = self.ahrs.get_all_data()
+        acc_sample_template = self.ahrs.get_all_data(self.line_counter)
         for key in acc_sample_template:
             acc_sample_template[key] = 0
 
@@ -53,15 +59,15 @@ class InertialNavigation():
     # powinno być wywoływane cyklicznie, dla każdej próbki z AHRS
     def run(self):
         # przesunięcie próbek, dodanie nowej próbki z AHRS
-        self.acc_samples[2] = self.acc_samples[1]
-        self.acc_samples[1] = self.acc_samples[0]
-        self.acc_samples[0] = self.ahrs.get_all_data()
-        self.vel_samples[1] = self.vel_samples[0]
+        self.acc_samples[2] = self.acc_samples[1].copy()
+        self.acc_samples[1] = self.acc_samples[0].copy()
+        self.acc_samples[0] = self.ahrs.get_all_data(self.line_counter)
+        self.vel_samples[1] = self.vel_samples[0].copy()
 
         # pobranie orientacji prosto z ahrs, bez przeliczania z przyspieszeń
         keys = ["yaw", "pitch", "roll"]
         for key in keys:
-            self.dis_sample[key] = self.acc_samples[0]["key"]
+            self.dis_sample[key] = self.acc_samples[0][key]
 
         # przemieszczenie w lokalnym układzie współrzędnych
         self.get_internal_displacement()
@@ -72,6 +78,10 @@ class InertialNavigation():
         # dodanie przemieszczeń do poprzedniej pozycji
         self.get_global_coordinates()
 
+        self.line_counter += 1
+
+        return self.pos_sample
+
     # przemieszczenie we współrzędnych wewnętrznych
     def get_internal_displacement(self):
         self.vel_samples[0]["time"] = self.acc_samples[0]["time"]
@@ -80,14 +90,10 @@ class InertialNavigation():
         keys_vel = ["lineV_x", "lineV_y", "lineV_z"]
         keys_pos = ["lineP_x", "lineP_y", "lineP_z"]
         for i in range(len(keys_acc)):
-            # żeby nie było dzielenia przez 0
-            if self.acc_samples[1]["time"] == 0:
-                self.vel_samples[0][keys_vel[i]] = 0
-            else:
-                # całkowanie numeryczne metodą trapezów
-                self.vel_samples[0][keys_vel[i]] += 0.5 * (
-                            self.acc_samples[0][keys_acc[i]] + self.acc_samples[1][keys_acc[i]]) * (
-                                                            self.acc_samples[0]["time"] - self.acc_samples[1]["time"])
+            # całkowanie numeryczne metodą trapezów
+            self.vel_samples[0][keys_vel[i]] += 0.5 * (
+                        self.acc_samples[0][keys_acc[i]] + self.acc_samples[1][keys_acc[i]]) * (
+                                                        self.acc_samples[0]["time"] - self.acc_samples[1]["time"])
             self.dis_sample[keys_pos[i]] = 0.5 * (
                         self.vel_samples[0][keys_vel[i]] + self.vel_samples[1][keys_vel[i]]) * (
                                                    self.vel_samples[0]["time"] - self.vel_samples[1]["time"])
@@ -113,13 +119,21 @@ class InertialNavigation():
 
         keys = ["lineP_x", "lineP_y", "lineP_z"]
         for i in range(3):
-            self.dis_sample[keys[i]] = dis_sample_matrix_global[i]
+            self.dis_sample[keys[i]] = dis_sample_matrix_global[i][0]
 
-    # aktualne położenie = przemieszczenia we współrzędnych globalnych + poprzedniego położenia
+    # położenie i orientacja we współrzędnych glabalnych
     def get_global_coordinates(self):
+        # aktualne położenie = przemieszczenia we współrzędnych globalnych + poprzedniego położenia
         keys_pos = ["lineP_x", "lineP_y", "lineP_z"]
         for i in range(len(keys_pos)):
             self.pos_sample[keys_pos[i]] += self.dis_sample[keys_pos[i]]
+
+        # pobranie orientacji prosto z ahrs, bez przeliczania z przyspieszeń
+        keys = ["yaw", "pitch", "roll"]
+        for key in keys:
+            self.pos_sample[key] = self.dis_sample[key]
+
+        self.pos_sample["time"] = self.acc_samples[0]["time"]
 
     @staticmethod
     def get_rotation_matrix(yaw, pitch, roll):
@@ -133,4 +147,31 @@ class InertialNavigation():
     def get_rotation_matrix_simplified(yaw):
         return np.array([[cos(yaw), - sin(yaw), 0], [sin(yaw), cos(yaw), 0], [0, 0, 1]])
 
+class Data:
+    def __init__(self):
+        file = open('ahrs.csv')
+        self.data = []
+        for line in file:
+            self.data.append({"time": float(line.split(",")[0]),
+                              "yaw": radians(float(line.split(",")[1])),
+                              "pitch": radians(float(line.split(",")[2])),
+                              "roll": radians(float(line.split(",")[3])),
+                              "lineA_x": float(line.split(",")[4]),
+                              "lineA_y": float(line.split(",")[5]),
+                              "lineA_z": float(line.split(",")[6])
+                              })
+        file.close()
+        self.line_counter_end = len(self.data)
 
+    def get_all_data(self, line_counter):
+        if line_counter <= self.line_counter_end:
+            return self.data[line_counter].copy()
+
+
+data = Data()
+end = data.line_counter_end
+
+inertial_navigation = InertialNavigation(data, INITIAL_STATE)
+
+for i in range(end):
+    print(inertial_navigation.run())
