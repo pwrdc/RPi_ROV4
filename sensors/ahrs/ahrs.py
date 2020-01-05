@@ -135,6 +135,20 @@ class AHRS(BaseSensor, IAHRS):
             ang_acc = self.get_angular_accelerations()
             return {**rot, **lin_acc, **ang_acc}
 
+    #@Base.multithread_method
+    def get_inertial_navigation_data(self):
+        '''
+        :return: dictionary with rotation and linear
+        accelerations, keys: "yaw", "pitch", "roll",
+        "lineA_x","lineA_y","lineA_z"
+        '''
+        if self.mode == 'SIMULATION':
+            return self.get_data()
+        else:
+            rot = self.get_rotation()
+            lin_acc = self.get_linear_accelerations()
+            return {**rot, **lin_acc}
+
 
 IMU_PORT = '/dev/ttyUSB0'
 
