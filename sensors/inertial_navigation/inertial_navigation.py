@@ -6,7 +6,7 @@ obsługa przejścia przez końce zakresu dla yaw
 
 from sensors.ahrs import ahrs
 import numpy as np
-from math import sin, cos, radians
+from math import sin, cos, radians, pi
 
 INITIAL_STATE = {"time": 0,
                  "yaw": radians(-100.0556640625),
@@ -67,7 +67,8 @@ class InertialNavigation():
         # pobranie orientacji prosto z ahrs, bez przeliczania z przyspieszeń
         keys = ["yaw", "pitch", "roll"]
         for key in keys:
-            self.dis_sample[key] = self.acc_samples[0][key]
+            self.dis_sample[key] = self.acc_samples[0][key] if self.acc_samples[0][key] > 0 else self.acc_samples[0][
+                                                                                                     key] + 2 * pi
 
         # przemieszczenie w lokalnym układzie współrzędnych
         self.get_internal_displacement()
