@@ -6,7 +6,9 @@ obsługa przejścia przez końce zakresu dla yaw
 
 #from sensors.ahrs import ahrs
 import numpy as np
-from math import sin, cos, radians
+from math import sin, cos, radians, pi
+from matplotlib import pyplot as plt
+import pandas as pd
 
 INITIAL_STATE = {"time": 0,
                  "yaw": radians(-100.0556640625),
@@ -65,9 +67,11 @@ class InertialNavigation():
         self.vel_samples[1] = self.vel_samples[0].copy()
 
         # pobranie orientacji prosto z ahrs, bez przeliczania z przyspieszeń
+        # obsługa przejścia przez końce zakresu
         keys = ["yaw", "pitch", "roll"]
         for key in keys:
-            self.dis_sample[key] = self.acc_samples[0][key]
+            self.dis_sample[key] = self.acc_samples[0][key] if self.acc_samples[0][key] > 0 else self.acc_samples[0][
+                                                                                                     key] + 2 * pi
 
         # przemieszczenie w lokalnym układzie współrzędnych
         self.get_internal_displacement()
@@ -172,6 +176,24 @@ data = Data()
 end = data.line_counter_end
 
 inertial_navigation = InertialNavigation(data, INITIAL_STATE)
+pos_data = INITIAL_STATE
+for key in pos_data:
+    pos_data[key] = [pos_data[key]]
 
 for i in range(end):
-    print(inertial_navigation.run())
+    new_data = inertial_navigation.run()
+    for key in new_data:
+        pos_data[key].append(new_data[key])
+
+print(pos_data)
+pos = pd.DataFrame(pos_data).iloc[:,[4,5,6]]
+
+print(pos)
+
+fig, axs = plt.subplots(1,2)
+fig.suptitle('Position')
+axs[0].scatter(pos.iloc[:,0], pos.iloc[:,2], s = 0.1)
+axs[0].set_title("Z(X)")
+axs[1].scatter(pos.iloc[:,0], pos.iloc[:,1], s = 0.1)
+axs[1].set_title("Y(X)")
+plt.show()
