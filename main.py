@@ -19,6 +19,7 @@ from sensors.distance.distance import DistanceSensor
 from sensors.hydrophones.hydrophones import HydrophonesPair
 from sensors.depth.depth import DepthSensor
 from sensors.ahrs.ahrs import AHRS
+from inertial_navigation import InertialNavigation
 
 #Control imports
 from control.movements.movements import Movements
@@ -27,7 +28,7 @@ from control.manipulator.manipulator import Manipulator
 from control.torpedoes.torpedoes import Torpedoes
 from control.dropper.dropper import Dropper
 
-from definitions import MODE, DEFLOG, SENSORS, CONTROL, RPI_ADDRESS
+from definitions import MODE, DEFLOG, SENSORS, CONTROL, RPI_ADDRESS, INERTIAL_NAVIGATION
 
 
 class Main():
@@ -46,6 +47,12 @@ class Main():
         self.depth = None
         self.hydrophones = None
         self.distance = None
+        self.inertial_navigation = None
+
+        if SENSORS.INERTIAL_NAVIGATION:
+            self.inertial_navigation = InertialNavigation(INERTIAL_NAVIGATION.INITIAL_STATE,
+                                                          INERTIAL_NAVIGATION.IS_ORIENTATION_SIMPLIFIED)
+        '''
         if SENSORS.AHRS:
             self.ahrs = AHRS(port=ports.AHRS_CLIENT_PORT,
                              main_logger=self.logger,
@@ -53,6 +60,7 @@ class Main():
                              log_timing=DEFLOG.AHRS_LOG_TIMING,
                              log_directory=DEFLOG.LOG_DIRECTORY,
                              mode=MODE)
+        '''
         if SENSORS.DEPTH:
             self.depth = DepthSensor(port=ports.DEPTH_CLIENT_PORT,
                                      main_logger=self.logger,
@@ -101,12 +109,14 @@ class Main():
         self.logger.start()
         if SENSORS.DEPTH:
             self.depth.run()
-        if SENSORS.AHRS:
-            self.ahrs.run()
+        #if SENSORS.AHRS:
+        #    self.ahrs.run()
         if SENSORS.HYDROPHONES:
             self.hydrophones.run()
         if SENSORS.DISTANCE:
             self.distance.run()
+        if SENSORS.INERTIAL_NAVIGATION:
+            self.inertial_navigation.run()
 
         self.movements.run()
         if CONTROL.MANIPULATOR:

@@ -11,6 +11,9 @@ else:
 class DEFLOG:
     LOG_DIRECTORY = "logs/RPi/"
 
+    INERTIAL_NAVIGATION_LOG = True
+    INERTIAL_NAVIGATION_LOG_TIMING = 0.0025
+
     DEPTH_LOCAL_LOG = True
     DEPTH_LOG_TIMING = 0.1
 
@@ -28,6 +31,7 @@ class DEFLOG:
     TORPEDOES_LOCAL_LOG = False
 
 class SENSORS:
+    INERTIAL_NAVIGATION = True
     AHRS = True
     DEPTH = True
     HYDROPHONES = False
@@ -55,3 +59,14 @@ class PID_YAW:
     KP = 0.04 #0.0
     KI = 0.001#.0
     KD = 0.004#0.0
+
+class INERTIAL_NAVIGATION:
+    INITIAL_STATE = {"time": 0,
+                     "yaw": 0,
+                     "pitch": 0,
+                     "roll": 0,
+                     "lineP_x": 0,
+                     "lineP_y": 0,
+                     "lineP_z": 0
+                     }
+    IS_ORIENTATION_SIMPLIFIED = True
