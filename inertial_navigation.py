@@ -59,6 +59,11 @@ class InertialNavigation():
     def run(self):
         while(True):
             start_time = time.time()
+            data = self.ahrs.get_data()
+            keys = ["yaw", "pitch", "roll"]
+            for key in keys:
+                data[key] = radians(data[key])
+
             # przesunięcie próbek, dodanie nowej próbki z AHRS
             self.acc_samples[2] = self.acc_samples[1].copy()
             self.acc_samples[1] = self.acc_samples[0].copy()
@@ -67,7 +72,6 @@ class InertialNavigation():
 
             # pobranie orientacji prosto z ahrs, bez przeliczania z przyspieszeń
             # układ ahrs obrócony do układu z initial_state
-            keys = ["yaw", "pitch", "roll"]
             for key in keys:
                 self.dis_sample[key] = self.acc_samples[0][key] - self.yaw_correction if self.acc_samples[0][
                                                                                              key] - self.yaw_correction > 0 else \
@@ -84,8 +88,8 @@ class InertialNavigation():
             self.get_global_coordinates()
 
             #return self.pos_sample
-
-            self.file_log.write(str(self.pos_sample))
+            msg = str(self.pos_sample) + "\n"
+            self.file_log.write(msg)
             time.sleep(0.0025)
 
     # przemieszczenie we współrzędnych wewnętrznych
