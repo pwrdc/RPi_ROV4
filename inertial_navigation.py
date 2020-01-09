@@ -12,8 +12,6 @@ from math import sin, cos, radians, pi
 from communication.rpi_drivers import ports
 
 
-
-
 class InertialNavigation():
     def __init__(self, initial_state, is_orientation_simplified=False):
         self.ahrs = AHRS(port=ports.AHRS_CLIENT_PORT)
@@ -51,6 +49,9 @@ class InertialNavigation():
         self.dis_sample = pos_sample_template.copy()
         self.pos_sample = initial_state.copy()
 
+        # do obrotu układu ahrs do układu z initial_state
+        self.yaw_correction = self.ahrs.get_inertial_navigation_data()["yaw"]
+
         self.file_log = open("inertial_navigation_log.txt", "w")
 
     # powinno być wywoływane cyklicznie, dla każdej próbki z AHRS
@@ -64,10 +65,13 @@ class InertialNavigation():
             self.vel_samples[1] = self.vel_samples[0].copy()
 
             # pobranie orientacji prosto z ahrs, bez przeliczania z przyspieszeń
+            # układ ahrs obrócony do układu z initial_state
             keys = ["yaw", "pitch", "roll"]
             for key in keys:
-                self.dis_sample[key] = self.acc_samples[0][key] if self.acc_samples[0][key] > 0 else self.acc_samples[0][
-                                                                                                     key] + 2 * pi
+                self.dis_sample[key] = self.acc_samples[0][key] - self.yaw_correction if self.acc_samples[0][
+                                                                                             key] - self.yaw_correction > 0 else \
+                self.acc_samples[0][
+                    key] + 2 * pi
 
             # przemieszczenie w lokalnym układzie współrzędnych
             self.get_internal_displacement()
