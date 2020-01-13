@@ -61,8 +61,7 @@ class PID_YAW:
     KD = 0.004#0.0
 
 class INERTIAL_NAVIGATION:
-    INITIAL_STATE = {"time": 0,
-                     "yaw": 0,
+    INITIAL_STATE = {"yaw": 0,
                      "pitch": 0,
                      "roll": 0,
                      "lineP_x": 0,

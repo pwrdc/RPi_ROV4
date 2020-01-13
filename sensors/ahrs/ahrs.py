@@ -9,6 +9,7 @@ import time
 import serial
 import os
 from logpy.LogPy import Logger
+import math
 IMU_PORT = '/dev/ttyUSB0'
 
 """
@@ -124,6 +125,13 @@ class AHRS(BaseSensor, IAHRS):
                     "angularA_z": self.ahrs.rate_of_turn[2]}
 
     #@Base.multithread_method
+    def get_time(self):
+        '''
+        :return: dictionary with keys "time"
+        '''
+        return {"time": time.time()}
+
+    #@Base.multithread_method
     def get_all_data(self):
         '''
         :return: dictionary with rotation, linear and angular
@@ -142,16 +150,24 @@ class AHRS(BaseSensor, IAHRS):
     #@Base.multithread_method
     def get_inertial_navigation_data(self):
         '''
-        :return: dictionary with rotation and linear
-        accelerations, keys: "yaw", "pitch", "roll",
+        :return: dictionary with time, rotation in radians
+        and linear accelerations,
+        keys: "time",
+        "yaw", "pitch", "roll",
         "lineA_x","lineA_y","lineA_z"
         '''
         if self.mode == 'SIMULATION':
-            return self.get_data()
+            data = self.get_data()
         else:
+            time = self.get_time()
             rot = self.get_rotation()
             lin_acc = self.get_linear_accelerations()
-            return {**rot, **lin_acc}
+            data = {**time, **rot, **lin_acc}
+        # degrees to radians
+        keys = ["yaw", "pitch", "roll"]
+        for key in keys:
+            data[key] = math.radians(data[key])
+        return data
 
 
 

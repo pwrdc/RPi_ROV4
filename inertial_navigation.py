@@ -18,21 +18,21 @@ class InertialNavigation():
 
         self.is_orientation_simplified = is_orientation_simplified
 
-        # słownik wejściowy z ahrs z wartościami 0
-        acc_sample_template = self.ahrs.get_data()
+        # słownik wejściowy z ahrs z wartościami 0, poza time, który jest niezmieniony
+        acc_sample_template = self.ahrs.get_inertial_navigation_data()
+        time_sample = acc_sample_template["time"]
         for key in acc_sample_template:
             acc_sample_template[key] = 0
+        acc_sample_template["time"] = time_sample
 
         # zmiana kluczy słowników na odpowiadające danym
         keys_acc = ["lineA_x", "lineA_y", "lineA_z"]
         keys_vel = ["lineV_x", "lineV_y", "lineV_z"]
         keys_pos = ["lineP_x", "lineP_y", "lineP_z"]
-
         vel_sample_template = acc_sample_template.copy()
         for i in range(len(keys_acc)):
             del vel_sample_template[keys_acc[i]]
             vel_sample_template[keys_vel[i]] = 0
-
         pos_sample_template = acc_sample_template.copy()
         for i in range(len(keys_acc)):
             del pos_sample_template[keys_acc[i]]
@@ -48,35 +48,38 @@ class InertialNavigation():
         for i in range(2):
             self.vel_samples.append(vel_sample_template.copy())
         self.dis_sample = pos_sample_template.copy()
-        self.pos_sample = initial_state.copy()
+        self.pos_sample = pos_sample_template.copy()
+        for key in initial_state:
+            self.pos_sample[key] = initial_state[key]
+
 
         # do obrotu układu ahrs do układu z initial_state
-        self.yaw_correction = self.ahrs.get_data()["yaw"]
+        self.yaw_correction = self.ahrs.get_inertial_navigation_data()["yaw"]
 
         self.file_log = open("inertial_navigation_log.txt", "w")
 
     # powinno być wywoływane cyklicznie, dla każdej próbki z AHRS
     def run(self):
         while(True):
-            start_time = time.time()
-            data = self.ahrs.get_data()
-            keys = ["yaw", "pitch", "roll"]
-            for key in keys:
-                data[key] = radians(data[key])
-
             # przesunięcie próbek, dodanie nowej próbki z AHRS
             self.acc_samples[2] = self.acc_samples[1].copy()
             self.acc_samples[1] = self.acc_samples[0].copy()
-            self.acc_samples[0] = self.ahrs.get_data()
+            self.acc_samples[0] = self.ahrs.get_inertial_navigation_data()
             self.vel_samples[1] = self.vel_samples[0].copy()
 
             # pobranie orientacji prosto z ahrs, bez przeliczania z przyspieszeń
-            # układ ahrs obrócony do układu z initial_state
+            keys = ["yaw", "pitch", "roll"]
             for key in keys:
-                self.dis_sample[key] = self.acc_samples[0][key] - self.yaw_correction if self.acc_samples[0][
-                                                                                             key] - self.yaw_correction > 0 else \
-                self.acc_samples[0][
-                    key] + 2 * pi
+                self.dis_sample[key] = self.acc_samples[0][key]
+
+            # obrót z układu ahrs do układu z initial state
+            self.dis_sample["yaw"] -= self.yaw_correction
+
+            # przejście z zakresu [-pi, pi] do [0, 2pi]
+            # (wymagane do obsługi get_global_displacement)
+            for key in keys:
+                if self.dis_sample[key] <= 0:
+                    self.dis_sample[key] += 2*pi
 
             # przemieszczenie w lokalnym układzie współrzędnych
             self.get_internal_displacement()
