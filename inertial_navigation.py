@@ -52,6 +52,12 @@ class InertialNavigation():
         for key in initial_state:
             self.pos_sample[key] = initial_state[key]
 
+        # przejście z zakresu [-pi, pi] do [0, 2pi]
+        # (wymagane do obsługi get_global_displacement)
+        keys = ["yaw", "pitch", "roll"]
+        for key in keys:
+            if self.pos_sample[key] < 0:
+                self.pos_sample[key] += 2 * pi
 
         # do obrotu układu ahrs do układu z initial_state
         self.yaw_correction = self.ahrs.get_inertial_navigation_data()["yaw"]
