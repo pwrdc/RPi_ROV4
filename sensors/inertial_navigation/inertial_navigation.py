@@ -10,8 +10,7 @@ from math import sin, cos, radians, pi
 from matplotlib import pyplot as plt
 import pandas as pd
 
-INITIAL_STATE = {"time": 0,
-                 "yaw": radians(-100.0556640625),
+INITIAL_STATE = {"yaw": radians(-100.0556640625),
                  "pitch": 0,
                  "roll": 0,
                  "lineP_x": 0,
@@ -19,28 +18,29 @@ INITIAL_STATE = {"time": 0,
                  "lineP_z": 0
                  }
 
+
 class InertialNavigation():
-    def __init__(self, ahrs, initial_state, is_orientation_simplified=False):
+    def __init__(self, ahrs_ref, initial_state, is_orientation_simplified=False):
         self.line_counter = 0
 
-        self.ahrs = ahrs
+        self.ahrs = ahrs_ref
         self.is_orientation_simplified = is_orientation_simplified
 
-        # słownik wejściowy z ahrs z wartościami 0
-        acc_sample_template = self.ahrs.get_all_data(self.line_counter)
+        # słownik wejściowy z ahrs z wartościami 0, poza time, który jest niezmieniony
+        acc_sample_template = self.ahrs.get_inertial_navigation_data(self.line_counter)
+        time_sample = acc_sample_template["time"]
         for key in acc_sample_template:
             acc_sample_template[key] = 0
+        acc_sample_template["time"] = time_sample
 
         # zmiana kluczy słowników na odpowiadające danym
         keys_acc = ["lineA_x", "lineA_y", "lineA_z"]
         keys_vel = ["lineV_x", "lineV_y", "lineV_z"]
         keys_pos = ["lineP_x", "lineP_y", "lineP_z"]
-
         vel_sample_template = acc_sample_template.copy()
         for i in range(len(keys_acc)):
             del vel_sample_template[keys_acc[i]]
             vel_sample_template[keys_vel[i]] = 0
-
         pos_sample_template = acc_sample_template.copy()
         for i in range(len(keys_acc)):
             del pos_sample_template[keys_acc[i]]
@@ -51,27 +51,47 @@ class InertialNavigation():
         self.acc_samples = []
         for i in range(3):
             self.acc_samples.append(acc_sample_template.copy())
-
         self.vel_samples = []
         for i in range(2):
             self.vel_samples.append(vel_sample_template.copy())
         self.dis_sample = pos_sample_template.copy()
-        self.pos_sample = initial_state.copy()
+        self.pos_sample = pos_sample_template.copy()
+
+        #przypisanie initial_state do pierwszej pozycji
+        for key in initial_state:
+            self.pos_sample[key] = initial_state[key]
+
+        # przejście z zakresu [-pi, pi] do [0, 2pi]
+        # (wymagane do obsługi get_global_displacement)
+        keys = ["yaw", "pitch", "roll"]
+        for key in keys:
+            if self.pos_sample[key] < 0:
+                self.pos_sample[key] += 2 * pi
+
+        # do obrotu układu ahrs do układu z initial_state
+        self.yaw_correction = self.ahrs.get_inertial_navigation_data(self.line_counter)["yaw"]
 
     # powinno być wywoływane cyklicznie, dla każdej próbki z AHRS
     def run(self):
         # przesunięcie próbek, dodanie nowej próbki z AHRS
         self.acc_samples[2] = self.acc_samples[1].copy()
         self.acc_samples[1] = self.acc_samples[0].copy()
-        self.acc_samples[0] = self.ahrs.get_all_data(self.line_counter)
+        self.acc_samples[0] = self.ahrs.get_inertial_navigation_data(self.line_counter)
         self.vel_samples[1] = self.vel_samples[0].copy()
 
         # pobranie orientacji prosto z ahrs, bez przeliczania z przyspieszeń
-        # obsługa przejścia przez końce zakresu
         keys = ["yaw", "pitch", "roll"]
         for key in keys:
-            self.dis_sample[key] = self.acc_samples[0][key] if self.acc_samples[0][key] > 0 else self.acc_samples[0][
-                                                                                                     key] + 2 * pi
+            self.dis_sample[key] = self.acc_samples[0][key]
+
+        # obrót z układu ahrs do układu z initial state
+        self.dis_sample["yaw"] -= self.yaw_correction
+
+        # przejście z zakresu [-pi, pi] do [0, 2pi]
+        # (wymagane do obsługi get_global_displacement)
+        for key in keys:
+            if self.dis_sample[key] < 0:
+                self.dis_sample[key] += 2 * pi
 
         # przemieszczenie w lokalnym układzie współrzędnych
         self.get_internal_displacement()
@@ -167,7 +187,7 @@ class Data:
         file.close()
         self.line_counter_end = len(self.data)
 
-    def get_all_data(self, line_counter):
+    def get_inertial_navigation_data(self, line_counter):
         if line_counter <= self.line_counter_end:
             return self.data[line_counter].copy()
 
