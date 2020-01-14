@@ -136,7 +136,7 @@ class AHRS(BaseSensor, IAHRS):
             return {**rot, **lin_acc, **ang_acc}
 
 
-IMU_PORT = '/dev/ttyUSB0'
+IMU_PORT = '/dev/ttyUSB_AHRS'
 
 class BytesQueue:
     def __init__(self, buffer: bytes):
