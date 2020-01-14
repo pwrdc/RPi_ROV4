@@ -173,7 +173,7 @@ class InertialNavigation():
 
 class Data:
     def __init__(self):
-        file = open('ahrs.csv')
+        file = open('nawigacja inercyjna test - dane wejściowe.csv')
         self.data = []
         for line in file:
             self.data.append({"time": float(line.split(",")[0]),
@@ -196,6 +196,18 @@ data = Data()
 end = data.line_counter_end
 
 inertial_navigation = InertialNavigation(data, INITIAL_STATE)
+
+file = open('inertial_navigation_log.csv', 'w')
+file.write("time, yaw, pitch, roll, lineP_x, lineP_y, lineP_z\n")
+for i in range(end):
+    entry_dict = inertial_navigation.run()
+    entry_str = ""
+    for key in entry_dict:
+        entry_str += str(entry_dict[key]) + ", "
+    file.write(entry_str+"\n")
+file.close()
+
+'''
 pos_data = INITIAL_STATE
 for key in pos_data:
     pos_data[key] = [pos_data[key]]
@@ -217,3 +229,4 @@ axs[0].set_title("Z(X)")
 axs[1].scatter(pos.iloc[:,0], pos.iloc[:,1], s = 0.1)
 axs[1].set_title("Y(X)")
 plt.show()
+'''
