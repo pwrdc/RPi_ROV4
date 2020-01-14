@@ -64,6 +64,8 @@ class InertialNavigation():
         self.yaw_correction = self.ahrs.get_inertial_navigation_data()["yaw"]
 
         self.file_log = open("inertial_navigation_log.txt", "w")
+        self.file_log.write("time, yaw, pitch, roll, lineP_x, lineP_y, lineP_z\n")
+
 
     # powinno być wywoływane cyklicznie, dla każdej próbki z AHRS
     def run(self):
@@ -98,7 +100,10 @@ class InertialNavigation():
             self.get_global_coordinates()
 
             #return self.pos_sample
-            msg = str(self.pos_sample) + "\n"
+            msg = ""
+            for key in self.pos_sample:
+                msg += str(self.pos_sample[key]) + ", "
+            msg += "\n"
             self.file_log.write(msg)
             time.sleep(0.0025)
 
