@@ -62,10 +62,14 @@ class InertialNavigation():
 
         # do obrotu układu ahrs do układu z initial_state
         self.yaw_correction = self.ahrs.get_inertial_navigation_data()["yaw"]
+        if self.yaw_correction < 0:
+            self.yaw_correction += 2*pi
 
         self.file_log = open("inertial_navigation_log.txt", "w")
         self.file_log.write("time, yaw, pitch, roll, lineP_x, lineP_y, lineP_z\n")
 
+        self.file_log_raw_data = open("inertial_navigation_log_raw_data.txt", "w")
+        self.file_log_raw_data.write("time, yaw, pitch, roll, lineA_x, lineA_y, lineA_z\n")
 
     # powinno być wywoływane cyklicznie, dla każdej próbki z AHRS
     def run(self):
@@ -105,6 +109,11 @@ class InertialNavigation():
                 msg += str(self.pos_sample[key]) + ", "
             msg += "\n"
             self.file_log.write(msg)
+            msg = ""
+            for key in self.acc_samples[0]:
+                msg += str(self.acc_samples[0][key]) + ", "
+            msg += "\n"
+            self.file_log_raw_data.write(msg)
             time.sleep(0.0025)
 
     # przemieszczenie we współrzędnych wewnętrznych
