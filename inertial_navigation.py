@@ -14,6 +14,7 @@ from communication.rpi_drivers import ports
 
 class InertialNavigation():
     def __init__(self, initial_state, ahrs_ref, is_orientation_simplified=False):
+        print("inertial navigation - start")
         self.ahrs = ahrs_ref
 
         self.is_orientation_simplified = is_orientation_simplified
