@@ -68,4 +68,4 @@ class INERTIAL_NAVIGATION:
                      "lineP_y": 0,
                      "lineP_z": 0
                      }
-    IS_ORIENTATION_SIMPLIFIED = True
+    IS_ORIENTATION_SIMPLIFIED = False
