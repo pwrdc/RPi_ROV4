@@ -165,19 +165,20 @@ class AHRS(BaseSensor, IAHRS):
         and linear accelerations,
         keys: "time",
         "yaw", "pitch", "roll",
-        "lineA_x","lineA_y","lineA_z"
+        "lineA_x", "lineA_y", "lineA_z"
         '''
         if self.mode == 'SIMULATION':
             data = self.get_data()
         else:
             time = self.get_time()
+            print(time)
             rot = self.get_rotation()
             lin_acc = self.get_linear_accelerations()
+            # degrees to radians
+            keys = ["yaw", "pitch", "roll"]
+            for key in keys:
+                rot[key] = math.radians(rot[key])
             data = {**time, **rot, **lin_acc}
-        # degrees to radians
-        keys = ["yaw", "pitch", "roll"]
-        for key in keys:
-            data[key] = math.radians(data[key])
         return data
 
 
