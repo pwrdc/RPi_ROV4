@@ -306,7 +306,7 @@ class AHRS_Separate():
             data_type = data.pop(2)
             if data_type.hex() == "1060":
                 self._interpret_timestamp(data)
-            if data_type.hex() == "2030":
+            elif data_type.hex() == "2030":
                 self._interpret_euler(data)
             elif data_type.hex() == "4030":
                 self._interpret_free_acceleration(data)
