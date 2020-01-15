@@ -140,7 +140,7 @@ class AHRS(BaseSensor, IAHRS):
             else:
                 return None
         else:
-            return {"time": self.ahrs.timestamp}
+            return {"time": float(self.ahrs.timestamp)/10000}
 
     #@Base.multithread_method
     def get_all_data(self):
