@@ -129,7 +129,18 @@ class AHRS(BaseSensor, IAHRS):
         '''
         :return: dictionary with keys "time"
         '''
-        return {"time": time.time()}
+        if self.mode == 'SIMULATION':
+            received = self.get_data()
+            output = {}
+            print(received)
+            if received != None:
+                #received = ast.literal_eval(received.decode("utf-8"))
+                output['time'] = received['time']
+                return output
+            else:
+                return None
+        else:
+            return {"time": self.ahrs.timestamp}
 
     #@Base.multithread_method
     def get_all_data(self):
@@ -190,6 +201,7 @@ class BytesQueue:
 
 
 class AHRS_Separate():
+    timestamp = 0
     yaw = 0
     pitch = 0
     roll = 0
@@ -198,6 +210,7 @@ class AHRS_Separate():
 
     def __init__(self, log_direcory=""):
         self.serial = serial.Serial(IMU_PORT, 115200, stopbits=2, parity=serial.PARITY_NONE)
+        self.lock_timestamp = threading.Lock()
         self.lock_rate_of_turn = threading.Lock()
         self.lock_free_acc = threading.Lock()
         self.lock_angular_pos = threading.Lock()
@@ -291,7 +304,8 @@ class AHRS_Separate():
     def _interpret_mtdata2(self, data: BytesQueue):
         while data.length() > 0:
             data_type = data.pop(2)
-
+            if data_type.hex() == "1060":
+                self._interpret_timestamp(data)
             if data_type.hex() == "2030":
                 self._interpret_euler(data)
             elif data_type.hex() == "4030":
@@ -301,6 +315,15 @@ class AHRS_Separate():
             else:
                 # print("Unexpected mtdata2 information type: {hex}".format(hex=data_type.hex()))
                 return
+
+    def _interpret_timestamp(self, data: BytesQueue):
+        length = data.pop()
+        if length != 4:
+            print("Unexpected timestamp data length")
+        sampleTimeFine_bytes = data.pop(4)
+
+        with self.lock_timestamp:
+            self.timestamp = struct.unpack(">I", sampleTimeFine_bytes)[0]
 
     def _interpret_message(self, mid: int, data: bytes):
         data_queue = BytesQueue(data)
