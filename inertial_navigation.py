@@ -65,10 +65,10 @@ class InertialNavigation():
         if self.yaw_correction < 0:
             self.yaw_correction += 2*pi
 
-        self.file_log = open("inertial_navigation_log.txt", "w")
+        self.file_log = open("inertial_navigation_log.csv", "w")
         self.file_log.write("time, yaw, pitch, roll, lineP_x, lineP_y, lineP_z\n")
 
-        self.file_log_raw_data = open("inertial_navigation_log_raw_data.txt", "w")
+        self.file_log_raw_data = open("inertial_navigation_log_raw_data.csv", "w")
         self.file_log_raw_data.write("time, yaw, pitch, roll, lineA_x, lineA_y, lineA_z\n")
 
     # powinno być wywoływane cyklicznie, dla każdej próbki z AHRS
