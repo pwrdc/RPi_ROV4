@@ -55,15 +55,15 @@ class InertialNavigation():
 
         # przejście z zakresu [-pi, pi] do [0, 2pi]
         # (wymagane do obsługi get_global_displacement)
-        keys = ["yaw", "pitch", "roll"]
-        for key in keys:
-            if self.pos_sample[key] < 0:
-                self.pos_sample[key] += 2 * pi
+        #keys = ["yaw", "pitch", "roll"]
+        #for key in keys:
+        #    if self.pos_sample[key] < 0:
+        #        self.pos_sample[key] += 2 * pi
 
         # do obrotu układu ahrs do układu z initial_state
         self.yaw_correction = self.ahrs.get_inertial_navigation_data()["yaw"]
-        if self.yaw_correction < 0:
-            self.yaw_correction += 2*pi
+        #if self.yaw_correction < 0:
+        #    self.yaw_correction += 2*pi
 
         self.file_log = open("inertial_navigation_log.csv", "w")
         self.file_log.write("time, yaw, pitch, roll, lineP_x, lineP_y, lineP_z\n")
@@ -90,9 +90,9 @@ class InertialNavigation():
 
             # przejście z zakresu [-pi, pi] do [0, 2pi]
             # (wymagane do obsługi get_global_displacement)
-            for key in keys:
-                if self.dis_sample[key] <= 0:
-                    self.dis_sample[key] += 2*pi
+            #for key in keys:
+            #    if self.dis_sample[key] <= 0:
+            #        self.dis_sample[key] += 2*pi
 
             # przemieszczenie w lokalnym układzie współrzędnych
             self.get_internal_displacement()

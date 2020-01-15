@@ -324,7 +324,7 @@ class AHRS_Separate():
         sampleTimeFine_bytes = data.pop(4)
 
         with self.lock_timestamp:
-            self.timestamp = struct.unpack(">I", sampleTimeFine_bytes)[0]
+            self.timestamp = struct.unpack(">L", sampleTimeFine_bytes)[0]
 
     def _interpret_message(self, mid: int, data: bytes):
         data_queue = BytesQueue(data)
