@@ -15,6 +15,7 @@ from communication.rpi_drivers import ports
 class InertialNavigation():
     SLEEP_TIME = 0.002
     SKIPPED_SAMPLES = 10
+    ACC_CUT_THRESHOLD = 0.1
 
     def __init__(self, initial_state, ahrs_ref, constant_bias, simplified_orientation=False,
                  simplified_displacement=False):
@@ -189,7 +190,8 @@ class InertialNavigation():
 
     def get_input_data(self):
         data = self.ahrs.get_inertial_navigation_data()
-        self.compensate_constant_bias(data)
+        #self.compensate_constant_bias(data)
+        self.cut_low_acc(data)
         return data
 
     # odejmuje od danych wejściowych stały błąd
@@ -203,6 +205,12 @@ class InertialNavigation():
         for i in range(self.SKIPPED_SAMPLES - 1):
             self.ahrs.get_inertial_navigation_data()
             time.sleep(self.SLEEP_TIME)
+
+    def cut_low_acc(self, data):
+        keys = ["lineA_x", "lineA_y", "lineA_z"]
+        for key in keys:
+            if -self.ACC_CUT_THRESHOLD < data[key] < self.ACC_CUT_THRESHOLD:
+                data[key] = 0
 
     @staticmethod
     def get_rotation_matrix(yaw, pitch, roll):
