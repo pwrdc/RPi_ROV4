@@ -11,13 +11,18 @@ import numpy as np
 from math import sin, cos, radians, pi
 from communication.rpi_drivers import ports
 
-
 class InertialNavigation():
+    SLEEP_TIME = 0.002
+    SKIPPED_SAMPLES = 10
+
     def __init__(self, initial_state, ahrs_ref, constant_bias,is_orientation_simplified=False):
         print("inertial navigation - start")
         self.ahrs = ahrs_ref
         self.constant_bias = constant_bias
         self.is_orientation_simplified = is_orientation_simplified
+
+        # pomijanie pierwszych, niewłaściwych próbek
+        self.skip_samples()
 
         # słownik wejściowy z ahrs z wartościami 0, poza time, który jest niezmieniony
         acc_sample_template = self.get_input_data()
@@ -114,7 +119,7 @@ class InertialNavigation():
                 msg += str(self.acc_samples[0][key]) + ", "
             msg += "\n"
             self.file_log_raw_data.write(msg)
-            time.sleep(0.002)
+            time.sleep(self.SLEEP_TIME)
 
     # przemieszczenie we współrzędnych wewnętrznych
     def get_internal_displacement(self):
@@ -128,6 +133,7 @@ class InertialNavigation():
             d_time = self.acc_samples[0]["time"] - self.acc_samples[1]["time"]
             if d_time > 1:
                 d_time = 0.0025
+                print("time error")
             self.vel_samples[0][keys_vel[i]] += 0.5 * (
                         self.acc_samples[0][keys_acc[i]] + self.acc_samples[1][keys_acc[i]]) * d_time
             d_time = self.vel_samples[0]["time"] - self.vel_samples[1]["time"]
@@ -184,6 +190,11 @@ class InertialNavigation():
         for key in keys:
             data[key] -= self.constant_bias[key]
 
+    # pomijanie pierwszych, niewłaściwych próbek
+    def skip_samples(self):
+        for i in range(self.SKIPPED_SAMPLES - 1):
+            self.ahrs.get_inertial_navigation_data()
+            time.sleep(self.SLEEP_TIME)
 
     @staticmethod
     def get_rotation_matrix(yaw, pitch, roll):

@@ -171,7 +171,6 @@ class AHRS(BaseSensor, IAHRS):
             data = self.get_data()
         else:
             time = self.get_time()
-            print(time)
             rot = self.get_rotation()
             lin_acc = self.get_linear_accelerations()
             # degrees to radians
