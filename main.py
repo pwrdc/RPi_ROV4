@@ -144,11 +144,11 @@ class Main():
         if SENSORS.INERTIAL_NAVIGATION:
             self.inertial_navigation = InertialNavigation(INERTIAL_NAVIGATION.INITIAL_STATE,
                                                           self.ahrs,
+                                                          INERTIAL_NAVIGATION.CONSTANT_BIAS,
                                                           INERTIAL_NAVIGATION.IS_ORIENTATION_SIMPLIFIED)
 
         if SENSORS.INERTIAL_NAVIGATION:
-            #self.inertial_navigation.run()
-            self.inertial_navigation.log_ahrs_data()
+            self.inertial_navigation.run()
 
 
         self.comm = Communication(self.sensors_refs, RPI_ADDRESS, main_logger=self.logger)

@@ -13,14 +13,14 @@ from communication.rpi_drivers import ports
 
 
 class InertialNavigation():
-    def __init__(self, initial_state, ahrs_ref, is_orientation_simplified=False):
+    def __init__(self, initial_state, ahrs_ref, constant_bias,is_orientation_simplified=False):
         print("inertial navigation - start")
         self.ahrs = ahrs_ref
-
+        self.constant_bias = constant_bias
         self.is_orientation_simplified = is_orientation_simplified
 
         # słownik wejściowy z ahrs z wartościami 0, poza time, który jest niezmieniony
-        acc_sample_template = self.ahrs.get_inertial_navigation_data()
+        acc_sample_template = self.get_input_data()
         time_sample = acc_sample_template["time"]
         for key in acc_sample_template:
             acc_sample_template[key] = 0
@@ -61,7 +61,7 @@ class InertialNavigation():
         #        self.pos_sample[key] += 2 * pi
 
         # do obrotu układu ahrs do układu z initial_state
-        self.yaw_correction = self.ahrs.get_inertial_navigation_data()["yaw"]
+        self.yaw_correction = self.get_input_data()["yaw"]
         #if self.yaw_correction < 0:
         #    self.yaw_correction += 2*pi
 
@@ -73,11 +73,11 @@ class InertialNavigation():
 
     # powinno być wywoływane cyklicznie, dla każdej próbki z AHRS
     def run(self):
-        while(True):
+        while True:
             # przesunięcie próbek, dodanie nowej próbki z AHRS
             self.acc_samples[2] = self.acc_samples[1].copy()
             self.acc_samples[1] = self.acc_samples[0].copy()
-            self.acc_samples[0] = self.ahrs.get_inertial_navigation_data()
+            self.acc_samples[0] = self.get_input_data()
             self.vel_samples[1] = self.vel_samples[0].copy()
 
             # pobranie orientacji prosto z ahrs, bez przeliczania z przyspieszeń
@@ -143,7 +143,7 @@ class InertialNavigation():
             [[self.dis_sample["lineP_x"]], [self.dis_sample["lineP_y"]], [self.dis_sample["lineP_z"]]])
 
         # macierz rotacji dla danych kątów
-        if(self.is_orientation_simplified):
+        if self.is_orientation_simplified:
             rot = self.get_rotation_matrix_simplified(yaw)
         else:
             rot = self.get_rotation_matrix(yaw, pitch, roll)
@@ -168,6 +168,18 @@ class InertialNavigation():
             self.pos_sample[key] = self.dis_sample[key]
 
         self.pos_sample["time"] = self.acc_samples[0]["time"]
+
+    def get_input_data(self):
+        data = self.ahrs.get_inertial_navigation_data()
+        self.compensate_constant_bias(data)
+        return data
+
+    # odejmuje od danych wejściowych stały błąd
+    def compensate_constant_bias(self, data):
+        keys = ["lineA_x", "lineA_y", "lineA_z"]
+        for key in keys:
+            data[key] -= self.constant_bias[key]
+
 
     @staticmethod
     def get_rotation_matrix(yaw, pitch, roll):
