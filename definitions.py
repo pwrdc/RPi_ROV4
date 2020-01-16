@@ -68,7 +68,8 @@ class INERTIAL_NAVIGATION:
                      "lineP_y": 0,
                      "lineP_z": 0
                      }
-    IS_ORIENTATION_SIMPLIFIED = False
+    SIMPLIFIED_ORIENTATION = False
+    SIMPLIFIED_GLOBAL_DISPLACEMENT = True
 
     CONSTANT_BIAS = {"lineA_x": -0.00141857862271016,
                      "lineA_y": -0.0129980750314774,

@@ -11,15 +11,18 @@ import numpy as np
 from math import sin, cos, radians, pi
 from communication.rpi_drivers import ports
 
+
 class InertialNavigation():
     SLEEP_TIME = 0.002
     SKIPPED_SAMPLES = 10
 
-    def __init__(self, initial_state, ahrs_ref, constant_bias,is_orientation_simplified=False):
+    def __init__(self, initial_state, ahrs_ref, constant_bias, simplified_orientation=False,
+                 simplified_displacement=False):
         print("inertial navigation - start")
         self.ahrs = ahrs_ref
         self.constant_bias = constant_bias
-        self.is_orientation_simplified = is_orientation_simplified
+        self.simplified_orientation = simplified_orientation
+        self.simplified_displacement = simplified_displacement
 
         # pomijanie pierwszych, niewłaściwych próbek
         self.skip_samples()
@@ -144,16 +147,21 @@ class InertialNavigation():
 
     # przemieszczenie we współrzędnych globalnych
     def get_global_displacement(self):
-        # obroty o kąt początkowy + połowa zmiany kąta ( = średnia kątów z dwóch kolejnych próbek)
-        # to nie jest żadne przybliżenie tylko dokładna wartość. i mogę to udowodnić!
-        yaw = (self.pos_sample["yaw"] + self.dis_sample["yaw"]) / 2
-        pitch = (self.pos_sample["pitch"] + self.dis_sample["pitch"]) / 2
-        roll = (self.pos_sample["roll"] + self.dis_sample["roll"]) / 2
+        if self.simplified_displacement:
+            yaw = self.dis_sample["yaw"]
+            pitch = self.dis_sample["pitch"]
+            roll = self.dis_sample["roll"]
+        else:
+            # obroty o kąt początkowy + połowa zmiany kąta ( = średnia kątów z dwóch kolejnych próbek)
+            # to nie jest żadne przybliżenie tylko dokładna wartość. i mogę to udowodnić!
+            yaw = (self.pos_sample["yaw"] + self.dis_sample["yaw"]) / 2
+            pitch = (self.pos_sample["pitch"] + self.dis_sample["pitch"]) / 2
+            roll = (self.pos_sample["roll"] + self.dis_sample["roll"]) / 2
         dis_sample_matrix_local = np.array(
             [[self.dis_sample["lineP_x"]], [self.dis_sample["lineP_y"]], [self.dis_sample["lineP_z"]]])
 
         # macierz rotacji dla danych kątów
-        if self.is_orientation_simplified:
+        if self.simplified_orientation:
             rot = self.get_rotation_matrix_simplified(yaw)
         else:
             rot = self.get_rotation_matrix(yaw, pitch, roll)
