@@ -114,7 +114,7 @@ class InertialNavigation():
                 msg += str(self.acc_samples[0][key]) + ", "
             msg += "\n"
             self.file_log_raw_data.write(msg)
-            time.sleep(0.0025)
+            time.sleep(0.002)
 
     # przemieszczenie we współrzędnych wewnętrznych
     def get_internal_displacement(self):
