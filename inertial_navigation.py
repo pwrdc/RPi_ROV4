@@ -190,7 +190,7 @@ class InertialNavigation():
 
     def get_input_data(self):
         data = self.ahrs.get_inertial_navigation_data()
-        #self.compensate_constant_bias(data)
+        self.compensate_constant_bias(data)
         self.cut_low_acc(data)
         return data
 

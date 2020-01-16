@@ -149,8 +149,8 @@ class Main():
                                                           INERTIAL_NAVIGATION.SIMPLIFIED_GLOBAL_DISPLACEMENT)
 
         if SENSORS.INERTIAL_NAVIGATION:
-            #self.inertial_navigation.run()
-            self.inertial_navigation.log_ahrs_data()
+            self.inertial_navigation.run()
+            #self.inertial_navigation.log_ahrs_data()
 
 
         self.comm = Communication(self.sensors_refs, RPI_ADDRESS, main_logger=self.logger)
