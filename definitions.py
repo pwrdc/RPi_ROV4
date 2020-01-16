@@ -75,3 +75,4 @@ class INERTIAL_NAVIGATION:
                      "lineA_y": 0.000562488138401941,
                      "lineA_z": -0.0354709617182832
                      }
+    TIME_STOP = 60

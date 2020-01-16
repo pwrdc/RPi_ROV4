@@ -17,13 +17,16 @@ class InertialNavigation():
     SKIPPED_SAMPLES = 10
     ACC_CUT_THRESHOLD = 0.1
 
-    def __init__(self, initial_state, ahrs_ref, constant_bias, simplified_orientation=False,
+    def __init__(self, initial_state, time_stop, ahrs_ref, constant_bias, simplified_orientation=False,
                  simplified_displacement=False):
         print("inertial navigation - start")
+        self.time_stop = time_stop
         self.ahrs = ahrs_ref
         self.constant_bias = constant_bias
         self.simplified_orientation = simplified_orientation
         self.simplified_displacement = simplified_displacement
+
+        self.time_start = time.time()
 
         # pomijanie pierwszych, niewłaściwych próbek
         self.skip_samples()
@@ -82,7 +85,7 @@ class InertialNavigation():
 
     # powinno być wywoływane cyklicznie, dla każdej próbki z AHRS
     def run(self):
-        while True:
+        while time.time() - self.time_start < self.time_stop:
             # przesunięcie próbek, dodanie nowej próbki z AHRS
             self.acc_samples[2] = self.acc_samples[1].copy()
             self.acc_samples[1] = self.acc_samples[0].copy()
