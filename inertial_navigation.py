@@ -125,9 +125,15 @@ class InertialNavigation():
         keys_pos = ["lineP_x", "lineP_y", "lineP_z"]
         for i in range(len(keys_acc)):
             # całkowanie numeryczne metodą trapezów
+            d_time = self.acc_samples[0]["time"] - self.acc_samples[1]["time"]
+            if d_time > 1:
+                d_time = 0.0025
             self.vel_samples[0][keys_vel[i]] += 0.5 * (
                         self.acc_samples[0][keys_acc[i]] + self.acc_samples[1][keys_acc[i]]) * (
                                                         self.acc_samples[0]["time"] - self.acc_samples[1]["time"])
+            d_time = self.vel_samples[0]["time"] - self.vel_samples[1]["time"]
+            if d_time > 1:
+                d_time = 0.0025
             self.dis_sample[keys_pos[i]] = 0.5 * (
                         self.vel_samples[0][keys_vel[i]] + self.vel_samples[1][keys_vel[i]]) * (
                                                    self.vel_samples[0]["time"] - self.vel_samples[1]["time"])
