@@ -127,6 +127,7 @@ class InertialNavigation():
             msg += "\n"
             self.file_log_raw_data.write(msg)
             time.sleep(self.SLEEP_TIME)
+        print("inertial navigation - end")
 
     # przemieszczenie we współrzędnych wewnętrznych
     def get_internal_displacement(self):
