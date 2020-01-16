@@ -181,3 +181,12 @@ class InertialNavigation():
     def get_rotation_matrix_simplified(yaw):
         return np.array([[cos(yaw), - sin(yaw), 0], [sin(yaw), cos(yaw), 0], [0, 0, 1]])
 
+    def log_ahrs_data(self):
+        data = self.ahrs.get_inertial_navigation_data()
+        msg = ""
+        for key in data:
+            msg += str(data[key]) + ", "
+        msg += "\n"
+        self.file_log_raw_data.write(msg)
+        time.sleep(0.0025)
+

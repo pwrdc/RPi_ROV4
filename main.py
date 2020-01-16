@@ -147,7 +147,8 @@ class Main():
                                                           INERTIAL_NAVIGATION.IS_ORIENTATION_SIMPLIFIED)
 
         if SENSORS.INERTIAL_NAVIGATION:
-            self.inertial_navigation.run()
+            #self.inertial_navigation.run()
+            self.inertial_navigation.log_ahrs_data()
 
 
         self.comm = Communication(self.sensors_refs, RPI_ADDRESS, main_logger=self.logger)
