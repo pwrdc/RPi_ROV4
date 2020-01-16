@@ -227,6 +227,7 @@ class InertialNavigation():
     def log_ahrs_data(self):
         while True:
             data = self.ahrs.get_inertial_navigation_data()
+            print(data[time])
             msg = ""
             for key in data:
                 msg += str(data[key]) + ", "
