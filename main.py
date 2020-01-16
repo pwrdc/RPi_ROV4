@@ -143,8 +143,8 @@ class Main():
 
         if SENSORS.INERTIAL_NAVIGATION:
             self.inertial_navigation = InertialNavigation(INERTIAL_NAVIGATION.INITIAL_STATE,
-                                                          self.ahrs,
                                                           INERTIAL_NAVIGATION.TIME_STOP,
+                                                          self.ahrs,
                                                           INERTIAL_NAVIGATION.CONSTANT_BIAS,
                                                           INERTIAL_NAVIGATION.SIMPLIFIED_ORIENTATION,
                                                           INERTIAL_NAVIGATION.SIMPLIFIED_GLOBAL_DISPLACEMENT)
