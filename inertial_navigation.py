@@ -129,14 +129,12 @@ class InertialNavigation():
             if d_time > 1:
                 d_time = 0.0025
             self.vel_samples[0][keys_vel[i]] += 0.5 * (
-                        self.acc_samples[0][keys_acc[i]] + self.acc_samples[1][keys_acc[i]]) * (
-                                                        self.acc_samples[0]["time"] - self.acc_samples[1]["time"])
+                        self.acc_samples[0][keys_acc[i]] + self.acc_samples[1][keys_acc[i]]) * d_time
             d_time = self.vel_samples[0]["time"] - self.vel_samples[1]["time"]
             if d_time > 1:
                 d_time = 0.0025
             self.dis_sample[keys_pos[i]] = 0.5 * (
-                        self.vel_samples[0][keys_vel[i]] + self.vel_samples[1][keys_vel[i]]) * (
-                                                   self.vel_samples[0]["time"] - self.vel_samples[1]["time"])
+                        self.vel_samples[0][keys_vel[i]] + self.vel_samples[1][keys_vel[i]]) * d_time
 
     # przemieszczenie we współrzędnych globalnych
     def get_global_displacement(self):
